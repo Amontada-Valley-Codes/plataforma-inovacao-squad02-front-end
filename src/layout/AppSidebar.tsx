@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
 import {
   BoxCubeIcon,
-  CalenderIcon,
   ChevronDownIcon,
   GridIcon,
   HorizontaLDots,
@@ -18,6 +17,7 @@ import {
   UserCircleIcon,
 } from "../icons/index";
 import SidebarWidget from "./SidebarWidget";
+import { Brain, Building2, Lightbulb, Rocket, X } from "lucide-react";
 
 type NavItem = {
   name: string;
@@ -29,14 +29,34 @@ type NavItem = {
 const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
-    name: "Exemple",
-    subItems: [{ name: "Ecommerce", path: "/", pro: false }],
+    name: "Dashboard",
+    path: "/", 
   },
+
   {
-    icon: <CalenderIcon />,
-    name: "Calendar",
-    path: "/calendar",
+    icon: <Lightbulb />,
+    name: "ideias",
+    path: "/ideias", 
   },
+  
+  {
+    icon: <Brain />,
+    name: "desafio",
+    path: "/desafio",
+  },
+
+  {
+    icon: <Building2 />,
+    name: "Startups",
+    path: "/startups",
+  },
+
+   {
+    icon: <Rocket />,
+    name: "Funil de inovaçoes",
+    path: "/inovacao",
+  },
+
   {
     icon: <UserCircleIcon />,
     name: "User Profile",
