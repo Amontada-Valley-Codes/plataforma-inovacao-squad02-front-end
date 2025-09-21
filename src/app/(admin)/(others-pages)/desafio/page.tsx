@@ -15,13 +15,15 @@ import Button from "@/components/ui/button/Button";
 import DatePicker from "@/components/form/date-picker";
 import TextArea from "@/components/form/input/TextArea";
 import { Lightbulb } from "lucide-react";
+import Card from "@/components/desafio/card";
 
 const formSchema = z.object({
-  nome:z.string().min(2, 'digite mais'),
-  dateInicial:z.date(),
-  dateFinal:z.date(),
-  tema:z.string().min(3, 'digite mais'),
-  descricao:z.string().min(3, 'digite mais')
+  nome:z.string().min(2, "Digite pelo menos 2 letras"),
+  dateInicial:z.date("Selecione a data de início"),
+  dateFinal:z.date("Selecione a data final"),
+  tema:z.string().min(3, "Digite mais detalhes para o tema"),
+  descricao: z.string().min(3, "Digite uma descrição mais completa"),
+  type:z.enum(['Publico','Privado'], "selecione Uma Opção")
   
 })
 
@@ -40,8 +42,15 @@ export default function page() {
     reset,
     formState:{errors}
   }=useForm<FormData>({
-    resolver: zodResolver(formSchema)
-  })
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+    nome: "",
+    tema: "",
+    descricao: "",  
+    dateInicial: undefined,
+    dateFinal: undefined,
+  }
+})
 
 
   const onSubmit = (data: FormData) => {
@@ -51,26 +60,27 @@ export default function page() {
 
   return (
     <div>
-  
-      <div className="flex justify-between">
-        <p className="text-2xl">Desafio</p>
-        <Button onClick={openModal} size="sm" variant="primary">
-              <Lightbulb size={20} />
-              Criar Desafio
-        </Button>
-        
+      <div className="px-3 py-5  rounded-2xl">
+        <div className="flex justify-between items-center">
+          <p className="text-2xl">Desafio</p>
+          <Button onClick={openModal} size="sm" variant="primary">
+                <Lightbulb size={20} />
+                Criar Desafio
+          </Button>
+        </div>
       </div>
 
-      
+      <div>
+        <Card 
+        title="teste1"
+        description="lorem  sdigsbyv5dfghiuytrerty"
+        stats={"ativo"}
+        dateInicial={"13/06/2034"} 
+        datefinal={"12/21/2121"} 
+        tipo={"publico"}/>
+      </div>
 
-
-      
-
-
-
-
-
-
+    
     <div>
 
       <Modal  isOpen={isOpen} onClose={closeModal}>
@@ -85,8 +95,12 @@ export default function page() {
                 type="text"
                 {...register("nome")}
                 />
+                {errors.nome && (
+                  <span className="text-red-600">{errors.nome.message}</span>
+                )}
               </div>
-
+              
+              <div>  
             <Controller
               control={control}
               name="dateInicial"
@@ -100,8 +114,13 @@ export default function page() {
                 />
               )}
             />
+            {errors.dateInicial && (
+                  <span className="text-red-600">{errors.dateInicial.message}</span>
+                )}
+            </div>
 
-             <Controller
+            <div>
+              <Controller
               control={control}
               name="dateFinal"
               render={({ field }) => (
@@ -114,6 +133,11 @@ export default function page() {
                 />
               )}
             />
+            {errors.dateFinal && (
+                  <span className="text-red-600">{errors.dateFinal.message}</span>
+                )}
+            </div>
+             
 
             <div>
               <Label >Tema:</Label>
@@ -122,8 +146,13 @@ export default function page() {
               type="text"
               {...register("tema")}
               />
+              {errors.tema && (
+                <span className="text-red-600">{errors.tema.message}</span>
+              )}
             </div>
-              
+
+
+            <div>
             <Label >Descriçao</Label>
             <Controller
               control={control}
@@ -133,13 +162,31 @@ export default function page() {
                 className="text-gray-950"
                   rows={6}
                   placeholder="Digite uma descrição"
-                  value={field.value}
+                  value={field.value || ""}
                   onChange={field.onChange}
-                  error={!!errors.descricao}
-                  hint={errors.descricao?.message}
+                  
                 />
               )}
             />
+             {errors.descricao && (
+                <span className="text-red-600">{errors.descricao.message}</span>
+              )}
+             </div>
+            
+            <div>
+
+            
+             <select
+            {...register("type")}
+             >
+              <option value="">selecione um</option>
+              <option value="Publico">Publico</option>
+              <option value="Privado">privado</option>
+            </select>
+             {errors.type && (
+              <span className="text-red-600">{errors.type.message}</span>
+             )}
+            </div>
 
             <Button className="w-full mt-2" size="sm">
               enviar
