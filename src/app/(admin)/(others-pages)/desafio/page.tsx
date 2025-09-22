@@ -72,8 +72,8 @@ export default function page() {
 
       <div>
         <Card 
-        title="teste1"
-        description="lorem  sdigsbyv5dfghiuytrerty"
+        title="Automaçâo de Processos internos"
+        description="Buscando inovaçoes para automatizar processo manuais"
         stats={"ativo"}
         dateInicial={"13/06/2034"} 
         datefinal={"12/21/2121"} 

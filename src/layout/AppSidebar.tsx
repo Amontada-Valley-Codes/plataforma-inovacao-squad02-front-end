@@ -55,6 +55,7 @@ const navItems: NavItem[] = [
     icon: <Rocket />,
     name: "Funil de inovaçoes",
     path: "/inovacao",
+    
   },
 
   {

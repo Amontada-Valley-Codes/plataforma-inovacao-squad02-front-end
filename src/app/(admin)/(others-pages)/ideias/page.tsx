@@ -2,6 +2,6 @@
 
 export default function page(){
     return(
-        <div></div>
+        <div>dfrty6u7i8i8uytgf  </div>
     )
 }
