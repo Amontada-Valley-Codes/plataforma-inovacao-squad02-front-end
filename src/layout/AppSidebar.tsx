@@ -17,7 +17,7 @@ import {
   UserCircleIcon,
 } from "../icons/index";
 import SidebarWidget from "./SidebarWidget";
-import { Brain, Building2, Lightbulb, Rocket, X } from "lucide-react";
+import { Brain, Building2, Lightbulb, Rocket, } from "lucide-react";
 
 type NavItem = {
   name: string;
@@ -334,22 +334,22 @@ const AppSidebar: React.FC = () => {
             <>
               <Image
                 className="dark:hidden"
-                src="/images/logo/logo.svg"
+                src="/HiveHub-logopreto.png"
                 alt="Logo"
-                width={150}
+                width={110}
                 height={40}
               />
               <Image
                 className="hidden dark:block"
-                src="/images/logo/logo-dark.svg"
+                src="/HiveHub-logobranca.png"
                 alt="Logo"
-                width={150}
+                width={110}
                 height={40}
               />
             </>
           ) : (
             <Image
-              src="/images/logo/logo-icon.svg"
+              src="/hivehub-icon.png"
               alt="Logo"
               width={32}
               height={32}
