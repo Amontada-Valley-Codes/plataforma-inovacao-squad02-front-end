@@ -92,7 +92,7 @@ const AppHeader: React.FC = () => {
               alt="Logo"
             />
             <Image
-              width={154}
+              width={90}
               height={32}
               className="hidden dark:block"
               src="/HiveHub-logobranca.png"

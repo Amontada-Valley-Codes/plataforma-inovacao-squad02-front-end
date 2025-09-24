@@ -333,20 +333,25 @@ const AppSidebar: React.FC = () => {
           {isExpanded || isHovered || isMobileOpen ? (
             <>
               <Image
-                className="dark:hidden"
+                className={isMobileOpen ? "hidden dark:hidden" : "block dark:hidden"}
                 src="/HiveHub-logopreto.png"
                 alt="Logo"
-                width={110}
+                width={100}
                 height={40}
               />
               <Image
-                className="hidden dark:block"
+                className={
+    isMobileOpen 
+      ? "hidden"  // Esconde quando menu mobile está aberto
+      : "hidden dark:block"  // Mostra APENAS no dark mode quando menu fechado
+  }
                 src="/HiveHub-logobranca.png"
                 alt="Logo"
-                width={110}
+                width={100}
                 height={40}
               />
             </>
+            
           ) : (
             <Image
               src="/hivehub-icon.png"
