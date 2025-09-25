@@ -43,7 +43,7 @@ export default function SignInForm() {
          <form onSubmit={handleSubmit(onSubmit)} >
                <div className="bg-white rounded-3xl py-10 px-6  space-y-8">
                  <div className="flex justify-center">
-                   <img src="/NinnaHubImage.png" alt="" className="w-40" />
+                   <img src="/HiveHub-logopreto.png" alt="" className="w-40" />
                 </div>
                 <div className="">
                   <Label>
