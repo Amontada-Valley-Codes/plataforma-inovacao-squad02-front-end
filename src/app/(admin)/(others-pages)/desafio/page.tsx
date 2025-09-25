@@ -175,8 +175,8 @@ export default function page() {
             
             <div>
 
-            
-             <select
+            <Label>selecione</Label>
+             <select className="px-5 py-2 w-full border rounded  "
             {...register("type")}
              >
               <option value="">selecione um</option>
