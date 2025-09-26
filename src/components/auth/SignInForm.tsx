@@ -46,7 +46,7 @@ export default function SignInForm() {
       password:data.password
     })
     console.log("login Realizado:", response.data);
-    localStorage.setItem("token", response.data.token)
+    localStorage.setItem("token", response.data.access_token);
     toast.success("Sucesso! Operação realizada.");
     router.push('/');
     reset()

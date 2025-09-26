@@ -24,7 +24,7 @@ const formSchema = z.object({
   endDate:z.date("Selecione a data final"),
   theme:z.string().min(3, "Digite mais detalhes para o tema"),
   description: z.string().min(3, "Digite uma descrição mais completa"),
-  visibility:z.enum(['Public','Privado'], "selecione Uma Opção")
+  visibility:z.enum(['PUBLIC','INTERNAL'], "selecione Uma Opção")
 })
 
 type FormData = z.infer<typeof formSchema>
@@ -52,16 +52,29 @@ export default function page() {
   }
 })
 
+function formatDate(date: Date) {
+  return date.toISOString().split("T")[0]; 
+}
+
 
   const onSubmit = async (data: FormData) => {
 
+    const payload = {
+    ...data,
+      startDate: formatDate(data.startDate),
+      endDate: formatDate(data.endDate),
+  };
+
     try{
-      const response = await api.post('/challenges',data)
+      const response = await api.post('/challenges',payload)
       console.log("Desafio cadastrado:", response.data);
+      
     }catch(error){
       console.error('Erro ao cadastrar', error)
     }
     reset()
+    closeModal()
+
   };
 
   return (
@@ -186,8 +199,8 @@ export default function page() {
             {...register("visibility")}
              >
               <option value="">selecione um</option>
-              <option value="Public">Publico</option>
-              <option value="Privado">privado</option>
+              <option value="PUBLIC">PUBLIC</option>
+              <option value="INTERNAL">INTERNAL</option>
             </select>
              {errors.visibility && (
               <span className="text-red-600">{errors.visibility.message}</span>
