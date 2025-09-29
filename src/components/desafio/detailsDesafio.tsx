@@ -1,4 +1,5 @@
 import { Modal } from "@/components/ui/modal";
+import Comment from "@/components/desafio/comment";
 
 type Props = {
     title:string,
@@ -14,7 +15,7 @@ type Props = {
 export default function DetalhesDesafio({ isOpen, onClose, title, stats, description, dateInicial, datefinal, tipo }: Props) {
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
-            <div className="p-6 min-w-[320px] max-w-[400px]">
+            <div className="p-6 min-w-[320px] ">
                 <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">{title}</h2>
                 <div className="mb-2 flex items-center gap-2">
                     <span className="font-semibold text-gray-700 dark:text-gray-200">Status:</span>
@@ -32,7 +33,16 @@ export default function DetalhesDesafio({ isOpen, onClose, title, stats, descrip
                     <span className="font-semibold text-gray-700 dark:text-gray-200">Tipo:</span>
                     <span className={`px-2 py-1 rounded text-white text-xs ${tipo === 'publico' ? 'bg-blue-600' : 'bg-purple-600'}`}>{tipo}</span>
                 </div>
+                <Comment
+                    username="John Doe"
+                    userImage="/public/images/user/user-17.jpg"
+                    comment="This is a comment."
+                    date="2 hours ago"
+                    likes={5}
+                    isLiked={true}
+                />
             </div>
+            
         </Modal>
     );
 }
