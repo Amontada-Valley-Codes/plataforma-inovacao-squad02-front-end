@@ -16,15 +16,15 @@ import DatePicker from "@/components/form/date-picker";
 import TextArea from "@/components/form/input/TextArea";
 import { Lightbulb } from "lucide-react";
 import Card from "@/components/desafio/card";
+import api from "@/services/axiosServices";
 
 const formSchema = z.object({
-  nome:z.string().min(2, "Digite pelo menos 2 letras"),
-  dateInicial:z.date("Selecione a data de início"),
-  dateFinal:z.date("Selecione a data final"),
-  tema:z.string().min(3, "Digite mais detalhes para o tema"),
-  descricao: z.string().min(3, "Digite uma descrição mais completa"),
-  type:z.enum(['Publico','Privado'], "selecione Uma Opção")
-  
+  name:z.string().min(2, "Digite pelo menos 2 letras"),
+  startDate:z.date("Selecione a data de início"),
+  endDate:z.date("Selecione a data final"),
+  theme:z.string().min(3, "Digite mais detalhes para o tema"),
+  description: z.string().min(3, "Digite uma descrição mais completa"),
+  visibility:z.enum(['PUBLIC','INTERNAL'], "selecione Uma Opção")
 })
 
 type FormData = z.infer<typeof formSchema>
@@ -44,18 +44,37 @@ export default function page() {
   }=useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-    nome: "",
-    tema: "",
-    descricao: "",  
-    dateInicial: undefined,
-    dateFinal: undefined,
+    name: "",
+    theme: "",
+    description: "",  
+    startDate: undefined,
+    endDate: undefined,
   }
 })
 
+function formatDate(date: Date) {
+  return date.toISOString().split("T")[0]; 
+}
 
-  const onSubmit = (data: FormData) => {
-    console.log("Form enviado:", data);
+
+  const onSubmit = async (data: FormData) => {
+
+    const payload = {
+    ...data,
+      startDate: formatDate(data.startDate),
+      endDate: formatDate(data.endDate),
+  };
+
+    try{
+      const response = await api.post('/challenges',payload)
+      console.log("Desafio cadastrado:", response.data);
+      
+    }catch(error){
+      console.error('Erro ao cadastrar', error)
+    }
     reset()
+    closeModal()
+
   };
 
   return (
@@ -93,17 +112,17 @@ export default function page() {
                 <Input 
                 placeholder="Digite seu nome"
                 type="text"
-                {...register("nome")}
+                {...register("name")}
                 />
-                {errors.nome && (
-                  <span className="text-red-600">{errors.nome.message}</span>
+                {errors.name && (
+                  <span className="text-red-600">{errors.name.message}</span>
                 )}
               </div>
               
               <div>  
             <Controller
               control={control}
-              name="dateInicial"
+              name="startDate"
               render={({ field }) => (
                 <DatePicker
                   id="date-picker"
@@ -114,15 +133,15 @@ export default function page() {
                 />
               )}
             />
-            {errors.dateInicial && (
-                  <span className="text-red-600">{errors.dateInicial.message}</span>
+            {errors.startDate && (
+                  <span className="text-red-600">{errors.startDate.message}</span>
                 )}
             </div>
 
             <div>
               <Controller
               control={control}
-              name="dateFinal"
+              name="endDate"
               render={({ field }) => (
                 <DatePicker
                   id="date-final"
@@ -133,8 +152,8 @@ export default function page() {
                 />
               )}
             />
-            {errors.dateFinal && (
-                  <span className="text-red-600">{errors.dateFinal.message}</span>
+            {errors.endDate && (
+                  <span className="text-red-600">{errors.endDate.message}</span>
                 )}
             </div>
              
@@ -144,10 +163,10 @@ export default function page() {
               <Input 
               placeholder="Digite seu nome"
               type="text"
-              {...register("tema")}
+              {...register("theme")}
               />
-              {errors.tema && (
-                <span className="text-red-600">{errors.tema.message}</span>
+              {errors.theme && (
+                <span className="text-red-600">{errors.theme.message}</span>
               )}
             </div>
 
@@ -156,7 +175,7 @@ export default function page() {
             <Label >Descriçao</Label>
             <Controller
               control={control}
-              name="descricao"
+              name="description"
               render={({ field }) => (
                 <TextArea
                 className="text-gray-950"
@@ -168,23 +187,23 @@ export default function page() {
                 />
               )}
             />
-             {errors.descricao && (
-                <span className="text-red-600">{errors.descricao.message}</span>
+             {errors.description && (
+                <span className="text-red-600">{errors.description.message}</span>
               )}
              </div>
             
             <div>
 
-            
-             <select
-            {...register("type")}
+            <Label>selecione</Label>
+             <select className="px-5 py-2 w-full border rounded  "
+            {...register("visibility")}
              >
               <option value="">selecione um</option>
-              <option value="Publico">Publico</option>
-              <option value="Privado">privado</option>
+              <option value="PUBLIC">PUBLIC</option>
+              <option value="INTERNAL">INTERNAL</option>
             </select>
-             {errors.type && (
-              <span className="text-red-600">{errors.type.message}</span>
+             {errors.visibility && (
+              <span className="text-red-600">{errors.visibility.message}</span>
              )}
             </div>
 

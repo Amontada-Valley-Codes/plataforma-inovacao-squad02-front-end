@@ -53,7 +53,7 @@ export const Modal: React.FC<ModalProps> = ({
 
   const contentClasses = isFullscreen
     ? "w-full h-full"
-    : "relative w-2xl rounded-3xl bg-white  dark:bg-gray-900";
+    : "relative w-2xl rounded bg-white  dark:bg-gray-900";
 
   return (
     <div className="fixed inset-0 flex items-center justify-center overflow-y- modal z-99999">
@@ -76,7 +76,7 @@ export const Modal: React.FC<ModalProps> = ({
           <X/>
           </button>
         )}
-        <div className="max-h-[100vh] overflow-y-auto ">
+        <div className="max-h-[80vh] rounded-2xl overflow-y-auto ">
           {children}
         </div>
       </div>

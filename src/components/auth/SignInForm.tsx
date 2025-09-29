@@ -5,21 +5,26 @@ import Label from "@/components/form/Label";
 import Button from "@/components/ui/button/Button";
 import {  EyeCloseIcon, EyeIcon } from "@/icons";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { useForm } from "react-hook-form";
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
+import api from "@/services/axiosServices";
+
+
 
 const formSchema = z.object({
-  login: z.string().min(5, "o e-mail deve ter pelo menos 5 caracteres."),
-  senha: z.string().min(3, "o senha deve ter pelo menos 3 caracteres.")
+  email: z.string().min(5, "o e-mail deve ter pelo menos 5 caracteres."),
+  password: z.string().min(3, "o senha deve ter pelo menos 3 caracteres.")
 })  
 
 
 type FormData = z.infer<typeof formSchema>
 
 export default function SignInForm() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   
   const{
@@ -31,10 +36,24 @@ export default function SignInForm() {
       resolver: zodResolver(formSchema),
     });
 
-  const onSubmit = (data: FormData) => {
-    console.log(data)
+
+
+  const onSubmit = async (data: FormData) => {
+
+    try{
+      const response = await api.post("/auth/login",{
+      email:data.email,
+      password:data.password
+    })
+    console.log("login Realizado:", response.data);
+    localStorage.setItem("token", response.data.access_token);
     toast.success("Sucesso! Operação realizada.");
+    router.push('/');
     reset()
+    }catch(error){
+      console.error('Erro ao entar', error)
+    }
+   
   }
 
 
@@ -43,7 +62,7 @@ export default function SignInForm() {
          <form onSubmit={handleSubmit(onSubmit)} >
                <div className="bg-white rounded-3xl py-10 px-6  space-y-8">
                  <div className="flex justify-center">
-                   <img src="/NinnaHubImage.png" alt="" className="w-40" />
+                   <img src="/HiveHub-logopreto.png" alt="" className="w-40" />
                 </div>
                 <div className="">
                   <Label>
@@ -52,13 +71,13 @@ export default function SignInForm() {
                   <Input 
                     placeholder="info@gmail.com" 
                     type="email"
-                    {...register("login")}
+                    {...register("email")}
                     max="30"
                     min="3"
                    />
                 </div>
-                 {errors.login &&(
-                <span className=" text-red-600">{errors.login.message}</span>
+                 {errors.email &&(
+                <span className=" text-red-600">{errors.email.message}</span>
               )}
                 <div>
                   <Label>
@@ -68,7 +87,7 @@ export default function SignInForm() {
                     <Input
                       type={showPassword ? "text" : "password"}
                       placeholder="Enter your password"
-                      {...register("senha")}
+                      {...register("password")}
                       
                     />
                     <span
@@ -81,8 +100,8 @@ export default function SignInForm() {
                         <EyeCloseIcon />
                       )}
                     </span>
-                    {errors.senha &&(
-                <span className=" text-red-600">{errors.senha.message}</span>
+                    {errors.password &&(
+                <span className=" text-red-600">{errors.password.message}</span>
               )}
                   </div>
                 </div>
