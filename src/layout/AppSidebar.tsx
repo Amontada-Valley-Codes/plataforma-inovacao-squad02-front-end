@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
 import {
   BoxCubeIcon,
-  CalenderIcon,
   ChevronDownIcon,
   GridIcon,
   HorizontaLDots,
@@ -18,6 +17,7 @@ import {
   UserCircleIcon,
 } from "../icons/index";
 import SidebarWidget from "./SidebarWidget";
+import { Brain, Building, Building2, Lightbulb, Rocket, } from "lucide-react";
 
 type NavItem = {
   name: string;
@@ -29,14 +29,42 @@ type NavItem = {
 const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
-    name: "Exemple",
-    subItems: [{ name: "Ecommerce", path: "/", pro: false }],
+    name: "Dashboard",
+    path: "/", 
+  },
+
+  {
+    icon: <Lightbulb />,
+    name: "ideias",
+    path: "/ideias", 
+  },
+  
+  {
+    icon: <Brain />,
+    name: "desafio",
+    path: "/desafio",
+  },
+
+  {
+    icon: <Building2 />,
+    name: "Startups",
+    path: "/startups",
+  },
+
+  {
+    icon: <Rocket />,
+    name: "Funil de inovaçoes",
+    path: "/inovacao",
+    
   },
   {
-    icon: <CalenderIcon />,
-    name: "Calendar",
-    path: "/calendar",
+    icon: <Building />,
+    name: "Empresa",
+    path: "/empresa",
+    
   },
+  
+
   {
     icon: <UserCircleIcon />,
     name: "User Profile",
@@ -312,23 +340,28 @@ const AppSidebar: React.FC = () => {
           {isExpanded || isHovered || isMobileOpen ? (
             <>
               <Image
-                className="dark:hidden"
-                src="/images/logo/logo.svg"
+                className={isMobileOpen ? "hidden dark:hidden" : "block dark:hidden"}
+                src="/HiveHub-logopreto.png"
                 alt="Logo"
-                width={150}
+                width={100}
                 height={40}
               />
               <Image
-                className="hidden dark:block"
-                src="/images/logo/logo-dark.svg"
+                className={
+    isMobileOpen 
+      ? "hidden"  // Esconde quando menu mobile está aberto
+      : "hidden dark:block"  // Mostra APENAS no dark mode quando menu fechado
+  }
+                src="/HiveHub-logobranca.png"
                 alt="Logo"
-                width={150}
+                width={100}
                 height={40}
               />
             </>
+            
           ) : (
             <Image
-              src="/images/logo/logo-icon.svg"
+              src="/hivehub-icon.png"
               alt="Logo"
               width={32}
               height={32}
