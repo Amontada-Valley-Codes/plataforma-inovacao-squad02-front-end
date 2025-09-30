@@ -12,7 +12,7 @@ type Props = {
 
 export default function Comment({ username, userImage, comment, date, likes, isLiked }: Props) {
     return (
-        <div className="flex items-start gap-3 p-4 bg-white dark:bg-gray-900 rounded-xl shadow-sm border mb-2">
+        <div className="flex items-start gap-3 p-3 bg-white dark:bg-gray-900 rounded-xl shadow-sm border mb-2">
             <img
                 src={userImage}
                 alt={username}
