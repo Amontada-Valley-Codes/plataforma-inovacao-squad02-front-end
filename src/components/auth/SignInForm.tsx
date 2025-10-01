@@ -52,15 +52,17 @@ export default function SignInForm() {
     reset()
     }catch(error){
       console.error('Erro ao entar', error)
+      toast.error("Email ou Senha Invalidos!");
+
     }
    
   }
 
 
   return (
-    <div>
-         <form onSubmit={handleSubmit(onSubmit)} >
-               <div className="bg-white rounded-3xl py-10 px-6  space-y-8">
+    <div className="flex justify-center items-center w-full">
+         <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-md px-3 space-y-8" >
+               <div className="bg-white rounded-3xl py-10   space-y-8">
                  <div className="flex justify-center">
                    <img src="/HiveHub-logopreto.png" alt="" className="w-40" />
                 </div>
@@ -108,7 +110,7 @@ export default function SignInForm() {
                 <div>
 
           
-                  <Button className="w-full" size="sm">
+                  <Button className="w-full " variant="primary" size="sm">
                     Entrar
                   </Button>
                   
