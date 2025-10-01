@@ -38,19 +38,22 @@ export default function  page(){
         resolver:zodResolver(formSchema)
     })
 
+    
+
     const onSubmit = async (data:FormData)=>{
 
         try{
             const response = await api.post('/empresas/with-manager', data)
             console.log(response.data)
+            toast.success("Sucesso! Empresa Cadastrada!");
 
         }catch(error){
             console.error('erro ao cadastar', error)
+            toast.error("erro no cadastro")
         }
-        toast.success("Sucesso! Empresa Cadastrada!");
+        
         reset()
         closeModal()
-       
     }
 
     return(
