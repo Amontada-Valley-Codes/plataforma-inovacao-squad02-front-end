@@ -11,6 +11,8 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import TextArea from "@/components/form/input/TextArea";
 import api from "@/services/axiosServices";
 import { toast, Toaster } from "sonner"
+import { useEffect, useState } from "react";
+import Cards from "@/components/empresa/Cards";
 
 
 
@@ -25,8 +27,19 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>
 
+
+type Empresa = {
+    name:string,
+    cnpj: string,
+    description:string,
+    createdAt: string, 
+}
+
+
 export default function  page(){
     const { isOpen, openModal, closeModal } = useModal();
+     const [empresas, setEmpresas] = useState<Empresa[]>([])
+    
 
     const {
         control,
@@ -38,7 +51,20 @@ export default function  page(){
         resolver:zodResolver(formSchema)
     })
 
-    
+   useEffect(() => {
+    const fetchEmpresas = async () => {
+      try {
+        const res = await api.get<Empresa[]>("/empresas");
+        setEmpresas(res.data); 
+        console.log("Empresas:", res.data);
+      } catch (erro) {
+        console.error("Erro ao buscar empresas", erro);
+      }
+    };
+
+    fetchEmpresas();
+  }, []);
+
 
     const onSubmit = async (data:FormData)=>{
 
@@ -46,6 +72,7 @@ export default function  page(){
             const response = await api.post('/empresas/with-manager', data)
             console.log(response.data)
             toast.success("Sucesso! Empresa Cadastrada!");
+            setEmpresas((prev) => [...prev, response.data])
 
         }catch(error){
             console.error('erro ao cadastar', error)
@@ -66,6 +93,22 @@ export default function  page(){
             <Button onClick={openModal} size="sm" variant="primary">Nova Empresa</Button>
                 
             </div>
+
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {empresas.map((empresa) => (
+                <Cards
+                    key={empresa.cnpj}
+                    name={empresa.name}
+                    cnpj={empresa.cnpj}
+                    description={empresa.description}
+                    createdAt={empresa.createdAt}
+                    />
+                ))}
+                </div>
+
+
+            
+     
             <div >
                 <Modal isOpen={isOpen} onClose={closeModal}>
                     <ComponentCard title="Criar nova empresa">
@@ -92,6 +135,7 @@ export default function  page(){
                             type="text"
                             placeholder="Digite o cnpj"
                             {...register('cnpj')}
+                            
                             />
                             {errors.cnpj && (
                                 <span className="text-red-600">
