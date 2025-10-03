@@ -17,7 +17,7 @@ import {
   UserCircleIcon,
 } from "../icons/index";
 import SidebarWidget from "./SidebarWidget";
-import { Brain, Building, Building2, Lightbulb, Rocket, } from "lucide-react";
+import { Brain, Building, Building2, Lightbulb, Rocket, User, } from "lucide-react";
 
 type NavItem = {
   name: string;
@@ -30,7 +30,7 @@ const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
-    path: "/", 
+    path: "/Ecommerce", 
   },
 
   {
@@ -69,6 +69,12 @@ const navItems: NavItem[] = [
     icon: <UserCircleIcon />,
     name: "User Profile",
     path: "/profile",
+  },
+
+   {
+    icon: <User />,
+    name: "Usuarios",
+    path: "/Usuarios",
   },
 
   // {
