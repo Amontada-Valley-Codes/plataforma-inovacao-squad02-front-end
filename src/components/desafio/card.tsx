@@ -1,20 +1,20 @@
-
-import { CalendarClock } from "lucide-react";
+import { CalendarClock, Eye } from "lucide-react";
 import Button from "@/components/ui/button/Button";
 import React, { useState } from "react";
 import DetalhesDesafio from "./detailsDesafio";
 
 type cardProps = {
+    id: string;
     title: string;
     stats: string;
+    startDate: String;
+    endDate: String;
+    theme: string;
     description: string;
-    dateInicial: string;
-    datefinal: string;
-    tipo: 'publico' | 'privado';
+    visibility: 'PUBLIC' | 'INTERNAL';
 };
 
-
-export default function Card({ title, stats, description, dateInicial, datefinal, tipo }: cardProps) {
+export default function Card({ id, title, stats, description, startDate, endDate, theme, visibility }: cardProps) {
     const [isOpen, setIsOpen] = useState(false);
 
     const openDetalhes = () => setIsOpen(true);
@@ -22,36 +22,51 @@ export default function Card({ title, stats, description, dateInicial, datefinal
 
     return (
         <>
-            <div className="px-4 py-6   max-w-[400px] rounded-2xl border">
+            <div className="px-4 py-6 max-w-[400px] rounded-2xl border-2 border-orange-200 bg-white hover:shadow-lg transition-all duration-300">
                 <div className="flex justify-between items-center">
-                    <p className="font-bold" >{title}</p>
-                    <p className="px-2 text-white bg-green-700 rounded-2xl">{stats}</p>
+                    <p className="font-bold text-gray-800">{title}</p>
+                    <p className="px-3 py-1 text-xs text-white bg-gradient-to-r from-orange-500 to-amber-600 rounded-full font-semibold">
+                        {stats}
+                    </p>
                 </div>
+                
                 <div className="mt-5">
-                    <p>{description}</p>
+                    <p className="text-gray-600 text-sm leading-relaxed">{description}</p>
                 </div>
 
-                <div className="mt-2 space-y-2 ">
-                    <div className="flex gap-1 items-center">
-                        <CalendarClock size={20} />
-                        <p className="text-sm"> {dateInicial} - {datefinal}</p>
+                <div className="mt-4">
+                    <div className="flex gap-2 items-center text-gray-700 bg-orange-50 px-3 py-2 rounded-lg border border-orange-100">
+                        <CalendarClock size={18} className="text-orange-600" />
+                        <p className="text-sm font-medium">{startDate} - {endDate}</p>
                     </div>
                 </div>
 
-                <div className="flex justify-between items-center mt-3">
-                    <p className="px-2 rounded-2xl text-white  bg-green-700  ">{tipo}</p>
-                    <Button onClick={openDetalhes} size="sm" variant="primary">Ver Detalhes</Button>
+                <div className="flex justify-between items-center mt-4">
+                    <p className={`px-3 py-1 rounded-full text-white text-sm font-semibold bg-gradient-to-r ${visibility === "PUBLIC" ? "from-green-500 to-emerald-600" : "from-red-500 to-rose-600"}`}>
+                        {visibility === "PUBLIC" ? "Público" : "Privado"}
+                    </p>
+                    <Button 
+                        onClick={openDetalhes} 
+                        size="sm" 
+                        variant="primary"
+                        className="bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-semibold"
+                    >
+                        Ver Detalhes
+                    </Button>
                 </div>
             </div>
+            
             <DetalhesDesafio
+                id={id}
                 isOpen={isOpen}
                 onClose={closeDetalhes}
                 title={title}
                 stats={stats}
                 description={description}
-                dateInicial={dateInicial}
-                datefinal={datefinal}
-                tipo={tipo}
+                startDate={startDate}
+                endDate={endDate}
+                theme={theme}
+                visibility={visibility}
             />
         </>
     );

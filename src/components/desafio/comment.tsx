@@ -1,14 +1,19 @@
-import { MessageSquareText } from 'lucide-react'
+import { CommentType } from "@/types/comment";
 
-export default function Comentarios() {
-  return (
-    <button 
-      className='flex items-center gap-2 px-3 py-1.5 text-sm text-gray-500 rounded hover:bg-gray-100 hover:text-[#F4A136]'
-    >
-      <MessageSquareText className="w-4.5 h-4.5"/>
-      <span className='font-medium'>11</span>
-    </button>
-  )
+type Props = {
+    comment: CommentType;
 }
 
-{/* #f48C24 #F4A136 */ }
+export default function Comment({ comment }: Props) {
+    return (
+        <div className="flex items-start gap-3 p-3 bg-white dark:bg-gray-900 rounded-xl shadow-sm border mb-2">
+            <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                    <span className="font-semibold text-gray-900 dark:text-white">{comment.user.name}</span>
+                    <span className="text-xs text-gray-400">{comment.createdAt}</span>
+                </div>
+                <p className="text-gray-800 dark:text-gray-100 mb-2">{comment.text}</p>
+            </div>
+        </div>
+    );
+}

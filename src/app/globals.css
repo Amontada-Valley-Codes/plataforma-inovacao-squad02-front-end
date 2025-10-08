@@ -203,7 +203,7 @@
 }
 
 @utility menu-item-active {
-  @apply bg-brand-50 text-brand-500 dark:bg-brand-500/[0.12] dark:text-brand-400;
+  @apply bg-orange-50 text-orange-500 dark:bg-orange-500/[0.12] dark:text-orange-400;
 }
 
 @utility menu-item-inactive {
@@ -215,7 +215,7 @@
 }
 
 @utility menu-item-icon-active {
-  @apply text-brand-500 dark:text-brand-400;
+  @apply text-orange-500 dark:text-orange-400;
 }
 
 @utility menu-item-icon-inactive {
@@ -239,7 +239,7 @@
 }
 
 @utility menu-dropdown-item-active {
-  @apply bg-brand-50 text-brand-500 dark:bg-brand-500/[0.12] dark:text-brand-400;
+  @apply bg-orange-50 text-orange-500 dark:bg-orange-500/[0.12] dark:text-orange-400;
 }
 
 @utility menu-dropdown-item-inactive {
@@ -247,15 +247,15 @@
 }
 
 @utility menu-dropdown-badge {
-  @apply block rounded-full px-2.5 py-0.5 text-xs font-medium uppercase text-brand-500 dark:text-brand-400;
+  @apply block rounded-full px-2.5 py-0.5 text-xs font-medium uppercase text-orange-500 dark:text-orange-400;
 }
 
 @utility menu-dropdown-badge-active {
-  @apply bg-brand-100 dark:bg-brand-500/20;
+  @apply bg-orange-100 dark:bg-orange-500/20;
 }
 
 @utility menu-dropdown-badge-inactive {
-  @apply bg-brand-50 group-hover:bg-brand-100 dark:bg-brand-500/15 dark:group-hover:bg-brand-500/20;
+  @apply bg-orange-50 group-hover:bg-orange-100 dark:bg-orange-500/15 dark:group-hover:bg-orange-500/20;
 }
 
 @utility no-scrollbar {
@@ -459,7 +459,7 @@ span.flatpickr-weekday,
 .flatpickr-day.selected.nextMonthDay,
 .flatpickr-day.startRange.nextMonthDay,
 .flatpickr-day.endRange.nextMonthDay {
-  background: #465fff;
+  background: #f58d25 !important;
   @apply !border-brand-500 !bg-brand-500 hover:!border-brand-50 hover:!bg-brand-500;
 }
 .flatpickr-day.selected.startRange + .endRange:not(:nth-child(7n + 1)),
