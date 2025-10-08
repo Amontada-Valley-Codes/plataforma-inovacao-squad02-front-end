@@ -1,5 +1,5 @@
 
-import { CalendarClock, Clock } from "lucide-react";
+import { CalendarClock } from "lucide-react";
 import Button from "@/components/ui/button/Button";
 import React, { useState } from "react";
 import DetalhesDesafio from "./detailsDesafio";
