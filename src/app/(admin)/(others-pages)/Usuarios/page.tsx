@@ -13,7 +13,7 @@ import { z } from "zod"
 
 
 const formSchema = z.object({
-  email:z.string().min(2, "Digite pelo menos 2 letras"),
+  email:z.string().min(5, "Email Muito Curto"),
   role:z.enum(['COMMON','EVALUATOR','MANAGER',], "selecione Uma Opção")
 })
 
@@ -75,7 +75,11 @@ export default function page(){
                                     placeholder="info@gmail.com"
                                     type="text"
                                     {...register('email')}
+
                                 />
+                                {errors.email && (
+                                    <span className="text-red-600">{errors.email.message}</span>
+                                )}
                             </div>
 
                             <div>
@@ -88,6 +92,9 @@ export default function page(){
                                     <option value="MANAGER">MANAGER</option>
                                   
                                 </select>
+                                {errors.role && (
+                                    <span className="text-red-600">{errors.role.message}</span>
+                                )}
                             </div>
 
                             <Button className="w-full">Enviar</Button>

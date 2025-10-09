@@ -48,7 +48,7 @@ export default function SignInForm() {
     // console.log("login Realizado:", response.data);
     localStorage.setItem("token", response.data.access_token);
     toast.success("Sucesso! Operação realizada.");
-    router.push('/Ecommerce');
+    router.push('/deshboard');
     reset()
     }catch(error){
       console.error('Erro ao entar', error)
