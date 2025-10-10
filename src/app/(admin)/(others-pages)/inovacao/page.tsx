@@ -17,15 +17,17 @@ interface Task {
 }
  
 const COLUMN_TITLES: Record<string, string> = {
-  backlog: "Backlog",
-  inProgress: "In Progress",
-  review: "Review",
-  done: "Done",
+  ideacao: "Ideação",
+  pretriagem: "Pre-triagem",
+  colaboracao: "colaboraçao",
+  avaliacao: "Avaliação",
+  experimentacao:"experimentação",
+
 };
  
 export default function pag() {
   const [columns, setColumns] = React.useState<Record<string, Task[]>>({
-    backlog: [
+    ideacao: [
       {
         id: "1",
         title: "Add authentication",
@@ -48,7 +50,7 @@ export default function pag() {
         dueDate: "2024-04-10",
       },
     ],
-    inProgress: [
+    pretriagem: [
       {
         id: "4",
         title: "Design system updates",
@@ -64,7 +66,40 @@ export default function pag() {
         dueDate: "2024-04-02",
       },
     ],
-    done: [
+    colaboracao: [
+      {
+        id: "7",
+        title: "Setup project",
+        priority: "high",
+        assignee: "Eve Davis",
+        dueDate: "2024-03-25",
+      },
+      {
+        id: "8",
+        title: "Initial commit",
+        priority: "low",
+        assignee: "Frank White",
+        dueDate: "2024-03-24",
+      },
+    ],
+
+    avaliacao: [
+      {
+        id: "7",
+        title: "Setup project",
+        priority: "high",
+        assignee: "Eve Davis",
+        dueDate: "2024-03-25",
+      },
+      {
+        id: "8",
+        title: "Initial commit",
+        priority: "low",
+        assignee: "Frank White",
+        dueDate: "2024-03-24",
+      },
+    ],
+    experimentacao: [
       {
         id: "7",
         title: "Setup project",
@@ -88,7 +123,7 @@ export default function pag() {
       onValueChange={setColumns}
       getItemValue={(item) => item.id}
     >
-      <Kanban.Board className="grid auto-rows-fr grid-cols-3">
+      <Kanban.Board className="flex overflow-auto">
         {Object.entries(columns).map(([columnValue, tasks]) => (
           <TaskColumn key={columnValue} value={columnValue} tasks={tasks} />
         ))}

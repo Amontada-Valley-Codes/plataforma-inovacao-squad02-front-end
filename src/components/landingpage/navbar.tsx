@@ -27,7 +27,7 @@ export default function NavbarComponent() {
           <a href="#desafios" className={LINK_CLASSES}>Desafios</a>
           <a href="#footer" className={`${LINK_CLASSES} border-2 border-warning-400 rounded-lg px-4 py-2`}>Contato</a>
         </div>
-        <Button className="bg-warning-500 text-white px-6 py-5.5 hover:bg-warning-600">Entrar</Button>
+        <Button href="/signin" className="bg-warning-500 text-white px-6 py-5.5 hover:bg-warning-600">Entrar</Button>
         <NavbarToggle />
       </div>
       

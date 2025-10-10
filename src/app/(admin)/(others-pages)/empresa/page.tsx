@@ -18,7 +18,7 @@ import Cards from "@/components/empresa/Cards";
 
 const formSchema = z.object({
     name:z.string().min(2, 'digite pelo menos 2 letras'),
-    cnpj:z.string().min(14, 'CNPJ inválido'),
+    cnpj:z.string().max(14, "cnpj invalido"),
     description:z.string().min(3, 'digite pelo menos uma descriçao mais completa'),
     managerName:z.string().min(2, 'digite pelo menos 2 letras'),
     managerEmail:z.string().min(5, 'email muito curto'),
@@ -58,8 +58,9 @@ export default function  page(){
         setEmpresas(res.data); 
         console.log("Empresas:", res.data);
       } catch (erro) {
-        console.error("Erro ao buscar empresas", erro);
+        console.error("Erro ao Cadastra uma empresa", erro);
       }
+      
     };
 
     fetchEmpresas();
@@ -133,7 +134,7 @@ export default function  page(){
                             <Label>Cnpj</Label>
                             <Input
                             type="text"
-                            placeholder="Digite o cnpj"
+                            placeholder="XX.XXX.XXX/0001-XX"
                             {...register('cnpj')}
                             
                             />
