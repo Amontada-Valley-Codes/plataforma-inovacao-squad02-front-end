@@ -1,10 +1,15 @@
 @import 'tailwindcss';
-@import "tw-animate-css";
+@plugin 'flowbite-react/plugin/tailwindcss';
+@source '../../.flowbite-react/class-list.json';
 
 @custom-variant dark (&:is(.dark *));
 
+  html {
+      scroll-behavior: smooth;
+    }
+
 @theme {
-  --font-*: initial;
+--font-*: initial;
   --font-outfit: Outfit, sans-serif;
 
   --breakpoint-*: initial;
