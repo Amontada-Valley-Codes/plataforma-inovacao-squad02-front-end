@@ -1,4 +1,4 @@
-import { CalendarClock, Eye } from "lucide-react";
+import { CalendarClock } from "lucide-react";
 import Button from "@/components/ui/button/Button";
 import React, { useState } from "react";
 import DetalhesDesafio from "./detailsDesafio";
@@ -7,8 +7,8 @@ type cardProps = {
     id: string;
     title: string;
     stats: string;
-    startDate: String;
-    endDate: String;
+    startDate: string;
+    endDate: string;
     theme: string;
     description: string;
     visibility: 'PUBLIC' | 'INTERNAL';

@@ -16,7 +16,7 @@ import TextArea from "@/components/form/input/TextArea";
 import { Lightbulb } from "lucide-react";
 import Card from "@/components/desafio/card";
 import api from "@/services/axiosServices";
-import { queryObjects } from "v8";
+
 
 const formSchema = z
   .object({
@@ -45,7 +45,7 @@ type Desafio = {
   visibility: "PUBLIC" | "INTERNAL";
 };
 
-export default function page() {
+export default function Page() {
   const { isOpen, openModal, closeModal } = useModal();
   const [desafios, setDesafios] = useState<Desafio[]>([]);
   const [loading, setLoading] = useState(true);
@@ -103,7 +103,6 @@ export default function page() {
           },
         });
         const desafios = response.data.data; 
-        const total = response.data.total;
         setDesafios(desafios);
       } catch (error) {
         console.error("Erro ao buscar desafios", error);

@@ -9,8 +9,8 @@ type Props = {
     id: string; // Adicione o id do desafio
     title: string;
     stats: string;
-    startDate: String;
-    endDate: String;
+    startDate: string;
+    endDate: string;
     theme: string;
     description: string;
     visibility: 'PUBLIC' | 'INTERNAL';
