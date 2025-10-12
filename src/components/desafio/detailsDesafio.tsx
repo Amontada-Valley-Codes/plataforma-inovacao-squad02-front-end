@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Modal } from "@/components/ui/modal";
-import Ideias from "./ideias";
+import Ideias from "./Ideias";
 import { Calendar, Eye, Globe, Lock, Tag } from "lucide-react";
 import api from "@/services/axiosServices";
 import { IdeiaType } from "@/types/ideia";
@@ -122,7 +122,7 @@ export default function DetalhesDesafio({
 
             {/* Seção de Ideias */}
             <div className="border-t-2 border-orange-100 bg-gradient-to-br from-orange-50 to-amber-50">
-                <Ideias ideias={ideias} />
+                <Ideias ideias={ideias}/>
             </div>
         </Modal>
     );

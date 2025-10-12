@@ -1,10 +1,11 @@
 import { FaHeart } from "react-icons/fa";
-import { MessageSquareText } from 'lucide-react';
+import { MessageSquareText, PlusCircle } from 'lucide-react';
 import { IdeiaType } from "@/types/ideia";
 import { useState, useEffect } from "react";
 import CommentList from "./commentList";
 import api from "@/services/axiosServices";
 import { CommentType } from "@/types/comment";
+// import FormIdea from "./FormIdea";
 
 
 type Props = {
@@ -17,8 +18,8 @@ export default function Ideia({ Ideia }: Props) {
     const [countLike, setCountLike] = useState(0);
     const [comments, setComments] = useState<CommentType[]>([]);
     const [loadingComments, setLoadingComments] = useState(false);
+    const [showForm, setShowForm] = useState(false);
 
-    
     useEffect(() => {
         if (Ideia.id) {
             api.get(`/idea-likes/${Ideia.id}/count`)
@@ -62,6 +63,10 @@ export default function Ideia({ Ideia }: Props) {
         }
     };
 
+    const handleAddCommentClick = () => {
+        setShowForm(!showForm);
+    };
+
     return (
         <div className="bg-white dark:bg-gray-900 rounded-lg shadow p-4 border border-gray-150 dark:border-gray-900">
             <div className="flex items-center mb-2">
@@ -88,6 +93,15 @@ export default function Ideia({ Ideia }: Props) {
                             Ver comentários
                         </span>
                     </button>
+                    <button
+                        className="flex items-center gap-1 text-gray-500 dark:text-gray-300 hover:text-orange-600 transition-colors"
+                        onClick={handleAddCommentClick}
+                    >
+                        <PlusCircle size={18} />
+                        <span className="ml-1 text-xs">
+                            Adicionar comentário
+                        </span>
+                    </button>
                 </div>
             </div>
             {showComments && (
@@ -99,9 +113,14 @@ export default function Ideia({ Ideia }: Props) {
                         <p className="text-gray-500 dark:text-gray-400">Nenhum comentário ainda.</p>
                     ) : (
                         <ul className="space-y-2">
-                                <CommentList comments={comments} />
+                            <CommentList comments={comments} />
                         </ul>
                     )}
+                </div>
+            )}
+            {showForm && (
+                <div className="mt-4 bg-orange-50 dark:bg-orange-950 rounded p-3">
+                    {/* <FormIdea ideiaId={Ideia.id} /> */}
                 </div>
             )}
         </div>

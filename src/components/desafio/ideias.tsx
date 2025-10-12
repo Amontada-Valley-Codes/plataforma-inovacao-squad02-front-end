@@ -1,4 +1,4 @@
-import Ideia from "./ideia";
+import Ideia from "./Ideia";
 import { IdeiaType } from "@/types/ideia";
 
 type Props = {
