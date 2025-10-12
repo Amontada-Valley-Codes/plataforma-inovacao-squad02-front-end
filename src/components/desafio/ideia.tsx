@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import CommentList from "./commentList";
 import api from "@/services/axiosServices";
 import { CommentType } from "@/types/comment";
+import { set } from "zod";
 // import FormIdea from "./FormIdea";
 
 
@@ -23,7 +24,7 @@ export default function Ideia({ Ideia }: Props) {
     useEffect(() => {
         if (Ideia.id) {
             api.get(`/idea-likes/${Ideia.id}/count`)
-                .then(res => setCountLike(res.data.count))
+                .then(res => setCountLike(res.data.likes))
                 .catch(() => setCountLike(0));
         }
     }, [Ideia.id, isLikedState]);
@@ -36,14 +37,18 @@ export default function Ideia({ Ideia }: Props) {
         }
     }, [Ideia.id]);
 
-    const toggleLike = () => {
-        setIsLikedState(!isLikedState);
+    const toggleLike = async () => {
         try {
             if (isLikedState) {
-                api.delete(`/idea-likes/${Ideia.id}`);
+                await api.delete(`/idea-likes/${Ideia.id}`);
             } else {
-                api.post(`/idea-likes/${Ideia.id}`);
+                await api.post(`/idea-likes/${Ideia.id}`);
             }
+
+        const res = await api.get(`/idea-likes/${Ideia.id}/count`);
+        setCountLike(res.data.likes);
+
+        setIsLikedState(!isLikedState);
         } catch (error) {
             console.error("Erro ao atualizar like", error);
         }
@@ -54,11 +59,12 @@ export default function Ideia({ Ideia }: Props) {
         if (!showComments && Ideia.id) {
             setLoadingComments(true);
             try {
-                const res = await api.get(`/idea-comments/ideia/${Ideia.id}`);
+                const res = await api.get(`/idea-comments/idea/${Ideia.id}`);
                 setComments(res.data);
             } catch {
                 setComments([]);
             }
+            console.log(comments);
             setLoadingComments(false);
         }
     };
@@ -82,7 +88,7 @@ export default function Ideia({ Ideia }: Props) {
                 <div className="flex items-center gap-4">
                     <button className="flex items-center gap-1 transition-colors" onClick={toggleLike}>
                         <FaHeart color={isLikedState ? '#fb6514' : '#d0d5dd'} />
-                        <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{countLike}</span>
+                        <h1 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{countLike}</h1>
                     </button>
                     <button
                         className="flex items-center gap-1 text-gray-500 dark:text-gray-300 hover:text-orange-600 transition-colors"
