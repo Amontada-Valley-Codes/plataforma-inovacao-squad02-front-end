@@ -7,7 +7,7 @@ type Props = {
 
 export default function CommentList({ comments }: Props) {
     return (
-        <div className='p-6'>
+        <div className=''>
             {comments.map((comment, index) => (
                 <Comment
                     key={index}
