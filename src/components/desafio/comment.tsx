@@ -10,7 +10,7 @@ export default function Comment({ comment }: Props) {
             <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                     <span className="font-semibold text-gray-900 dark:text-white">{comment.user.name}</span>
-                    <span className="text-xs text-gray-400">{comment.createdAt}</span>
+                    <span className="text-xs text-gray-400">{comment.createdAt.toLocaleString()}</span>
                 </div>
                 <p className="text-gray-800 dark:text-gray-100 mb-2">{comment.text}</p>
             </div>
