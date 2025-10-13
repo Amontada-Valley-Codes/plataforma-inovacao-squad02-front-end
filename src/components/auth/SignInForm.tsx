@@ -12,6 +12,7 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
 import api from "@/services/axiosServices";
+import Image from "next/image";
 
 
 
@@ -26,6 +27,8 @@ type FormData = z.infer<typeof formSchema>
 export default function SignInForm() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   
   const{
     register,
@@ -39,7 +42,7 @@ export default function SignInForm() {
 
 
   const onSubmit = async (data: FormData) => {
-
+    setLoading(true);
     try{
       const response = await api.post("/auth/login",{
       email:data.email,
@@ -54,6 +57,8 @@ export default function SignInForm() {
       console.error('Erro ao entar', error)
       toast.error("Email ou Senha Invalidos!");
 
+    } finally {
+        setLoading(false);
     }
    
   }
@@ -62,9 +67,16 @@ export default function SignInForm() {
   return (
     <div className="flex justify-center items-center w-full">
          <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-md px-3 space-y-8" >
-               <div className="bg-white rounded-3xl py-10   space-y-8">
+               <div className="bg-white dark:bg-gray-800 rounded-3xl py-10   space-y-8 p-5">
                  <div className="flex justify-center">
-                   <img src="/HiveHub-logopreto.png" alt="" className="w-40" />
+                  <Image
+                    src="/HiveHub-logopreto.png"
+                    alt="Logo HiveHub"
+                    width={160} 
+                    height={64} 
+                    className="w-40"
+                    priority
+                  />
                 </div>
                 <div className="">
                   <Label>
@@ -111,7 +123,7 @@ export default function SignInForm() {
 
           
                   <Button className="w-full " variant="primary" size="sm">
-                    Entrar
+                     {loading ? "Enviando..." : "Entrar"}
                   </Button>
                   
                 </div>

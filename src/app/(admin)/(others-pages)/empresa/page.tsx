@@ -36,7 +36,7 @@ type Empresa = {
 }
 
 
-export default function  page(){
+export default function  Page(){
     const { isOpen, openModal, closeModal } = useModal();
      const [empresas, setEmpresas] = useState<Empresa[]>([])
     

@@ -21,7 +21,7 @@ type FormData = z.infer<typeof formSchema>
 
 
 
-export default function page(){
+export default function Page(){
 
     const { isOpen, openModal, closeModal } = useModal();
 

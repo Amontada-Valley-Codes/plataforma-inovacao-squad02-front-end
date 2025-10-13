@@ -16,7 +16,15 @@ import TextArea from "@/components/form/input/TextArea";
 import { Lightbulb } from "lucide-react";
 import Card from "@/components/desafio/card";
 import api from "@/services/axiosServices";
-import { queryObjects } from "v8";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
+
 
 const formSchema = z
   .object({
@@ -45,11 +53,13 @@ type Desafio = {
   visibility: "PUBLIC" | "INTERNAL";
 };
 
-export default function page() {
+export default function Page() {
   const { isOpen, openModal, closeModal } = useModal();
   const [desafios, setDesafios] = useState<Desafio[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const {
     control,
@@ -96,15 +106,15 @@ export default function page() {
     const fetchDesafios = async () => {
       setLoading(true);
       try {
-        const response = await api.get("/public/challenges", {
+        const response = await api.get("/internal/challenges", {
           params: {
-            page: 1,
-            limit: 10,
+            page: currentPage,
+            limit: 9,
           },
         });
-        const desafios = response.data.data; 
-        const total = response.data.total;
+        const desafios = response.data.data;
         setDesafios(desafios);
+        setTotalPages(Math.ceil(response.data.total / response.data.limit));
       } catch (error) {
         console.error("Erro ao buscar desafios", error);
         setError("Erro ao carregar desafios.");
@@ -113,7 +123,7 @@ export default function page() {
       }
     };
     fetchDesafios();
-  }, []);
+  }, [currentPage]);
 
   if (loading) {
     return (
@@ -149,25 +159,61 @@ export default function page() {
             <p className="text-gray-500">Comece criando seu primeiro desafio!</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {desafios.map((desafio) => (
-              <Card
-                key={desafio.id}
-                id={desafio.id}
-                title={desafio.name}
-                description={desafio.description}
-                stats={desafio.status}
-                startDate={new Date(desafio.startDate).toLocaleDateString()}
-                endDate={
-                  desafio.endDate
-                    ? new Date(desafio.endDate).toLocaleDateString()
-                    : ""
-                }
-                theme={desafio.theme}
-                visibility={desafio.visibility}
-              />
-            ))}
-          </div>
+          <>
+            <Pagination>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {desafios.map((desafio) => (
+                  <Card
+                    key={desafio.id}
+                    id={desafio.id}
+                    title={desafio.name}
+                    description={desafio.description}
+                    stats={desafio.status}
+                    startDate={new Date(desafio.startDate).toLocaleDateString()}
+                    endDate={
+                      desafio.endDate
+                        ? new Date(desafio.endDate).toLocaleDateString()
+                        : ""
+                    }
+                    theme={desafio.theme}
+                    visibility={desafio.visibility}
+                  />
+                ))}
+              </div>
+            </Pagination>
+
+            <div className="mt-6 flex justify-center">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      href="#"
+                      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                      aria-disabled={currentPage === 1}
+                    />
+                  </PaginationItem>
+                  {[...Array(totalPages)].map((_, idx) => (
+                    <PaginationItem key={idx}>
+                      <PaginationLink
+                        href="#"
+                        isActive={currentPage === idx + 1}
+                        onClick={() => setCurrentPage(idx + 1)}
+                      >
+                        {idx + 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+                  <PaginationItem>
+                    <PaginationNext
+                      href="#"
+                      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                      aria-disabled={currentPage === totalPages}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          </>
         )}
       </div>
 
@@ -268,8 +314,8 @@ export default function page() {
                     {...register("visibility")}
                   >
                     <option value="">selecione um</option>
-                    <option value="PUBLIC">PUBLIC</option>
-                    <option value="INTERNAL">INTERNAL</option>
+                    <option value="PUBLIC">Publico</option>
+                    <option value="INTERNAL">Interno</option>
                   </select>
                   {errors.visibility && (
                     <span className="text-red-600">{errors.visibility.message}</span>
@@ -277,7 +323,7 @@ export default function page() {
                 </div>
 
                 <Button className="w-full mt-2" size="sm">
-                  enviar
+                  Enviar
                 </Button>
               </div>
             </form>

@@ -25,7 +25,7 @@ const COLUMN_TITLES: Record<string, string> = {
 
 };
  
-export default function pag() {
+export default function Page() {
   const [columns, setColumns] = React.useState<Record<string, Task[]>>({
     ideacao: [
       {

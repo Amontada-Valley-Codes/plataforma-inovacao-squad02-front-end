@@ -1,20 +1,21 @@
-import { CalendarClock, Eye } from "lucide-react";
+import { CalendarClock } from "lucide-react";
 import Button from "@/components/ui/button/Button";
 import React, { useState } from "react";
 import DetalhesDesafio from "./detailsDesafio";
+import { ChallengeType } from "@/types/challenge";
 
 type cardProps = {
     id: string;
     title: string;
     stats: string;
-    startDate: String;
-    endDate: String;
+    startDate: string;
+    endDate: string;
     theme: string;
     description: string;
     visibility: 'PUBLIC' | 'INTERNAL';
 };
 
-export default function Card({ id, title, stats, description, startDate, endDate, theme, visibility }: cardProps) {
+export default function Card({ id, title, stats, startDate, endDate, theme, description, visibility }: cardProps) {
     const [isOpen, setIsOpen] = useState(false);
 
     const openDetalhes = () => setIsOpen(true);
@@ -22,20 +23,20 @@ export default function Card({ id, title, stats, description, startDate, endDate
 
     return (
         <>
-            <div className="px-4 py-6 max-w-[400px] rounded-2xl border-2 border-orange-200 bg-white hover:shadow-lg transition-all duration-300">
+            <div className="px-4 py-6 max-w-[400px] rounded-2xl border-2 border-orange-200 bg-white dark:bg-gray-900 hover:shadow-lg transition-all duration-300">
                 <div className="flex justify-between items-center">
-                    <p className="font-bold text-gray-800">{title}</p>
+                    <p className="font-bold text-gray-800 dark:text-gray-100">{title}</p>
                     <p className="px-3 py-1 text-xs text-white bg-gradient-to-r from-orange-500 to-amber-600 rounded-full font-semibold">
                         {stats}
                     </p>
                 </div>
                 
                 <div className="mt-5">
-                    <p className="text-gray-600 text-sm leading-relaxed">{description}</p>
+                    <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">{description}</p>
                 </div>
 
                 <div className="mt-4">
-                    <div className="flex gap-2 items-center text-gray-700 bg-orange-50 px-3 py-2 rounded-lg border border-orange-100">
+                    <div className="flex gap-2 items-center text-gray-700 dark:text-gray-300 bg-orange-50 dark:bg-gray-800 px-3 py-2 rounded-lg border border-orange-100 dark:border-gray-700">
                         <CalendarClock size={18} className="text-orange-600" />
                         <p className="text-sm font-medium">{startDate} - {endDate}</p>
                     </div>
@@ -57,16 +58,9 @@ export default function Card({ id, title, stats, description, startDate, endDate
             </div>
             
             <DetalhesDesafio
-                id={id}
+                challenge={{ id, title, stats, startDate, endDate, theme, description, visibility } as ChallengeType}
                 isOpen={isOpen}
                 onClose={closeDetalhes}
-                title={title}
-                stats={stats}
-                description={description}
-                startDate={startDate}
-                endDate={endDate}
-                theme={theme}
-                visibility={visibility}
             />
         </>
     );
