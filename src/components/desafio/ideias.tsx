@@ -16,9 +16,9 @@ export default function Ideias({ ideias, challengeId }: Props) {
             <h1 className="text-2xl font-bold mb-2">Ideias</h1>
             <p className="mb-6 text-gray-700 dark:text-gray-300">
                 Aqui você pode compartilhar suas ideias para novos desafios ou melhorias nos desafios existentes.<br />
-                <span className="font-medium">Sua contribuição é muito importante para nós!</span>
+                {/* <span className="font-medium">Sua contribuição é muito importante para nós!</span> */}
                 <button 
-                    className="mt-4 px-6 py-2 bg-orange-600 hover:bg-orange-700  transition-colors text-white font-semibold rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-opacity-50"
+                    className=" mt-4 px-6 py-2 bg-orange-600 hover:bg-orange-700  transition-colors text-white font-semibold rounded-lg shadow"
                     onClick={() => setShowForm(!showForm)}
                 >
                     {showForm ? "Fechar Formulário" : "Compartilhar Ideia"}

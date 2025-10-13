@@ -19,7 +19,6 @@ import api from "@/services/axiosServices";
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
