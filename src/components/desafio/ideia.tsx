@@ -6,7 +6,7 @@ import CommentList from "./commentList";
 import api from "@/services/axiosServices";
 import { CommentType } from "@/types/comment";
 import { set } from "zod";
-// import FormIdea from "./FormIdea";
+import CommentForm from "./CommentForm";
 
 
 type Props = {
@@ -104,14 +104,14 @@ export default function Ideia({ Ideia }: Props) {
                         onClick={handleAddCommentClick}
                     >
                         <PlusCircle size={18} />
-                        <span className="ml-1 text-xs">
+                        <span className="ml-1 text-xs" onClick={handleAddCommentClick}>
                             Adicionar comentário
                         </span>
                     </button>
                 </div>
             </div>
             {showComments && (
-                <div className="mt-4 bg-orange-50 dark:bg-orange-950 rounded p-3">
+                <div className="mt-4 bg-orange-50 dark:bg-gray-900 rounded p-3">
                     <h4 className="font-semibold text-orange-700 dark:text-orange-300 mb-2">Comentários</h4>
                     {loadingComments ? (
                         <p className="text-gray-500 dark:text-gray-400">Carregando comentários...</p>
@@ -125,8 +125,8 @@ export default function Ideia({ Ideia }: Props) {
                 </div>
             )}
             {showForm && (
-                <div className="mt-4 bg-orange-50 dark:bg-orange-950 rounded p-3">
-                    {/* <FormIdea ideiaId={Ideia.id} /> */}
+                <div className="mt-4 bg-orange-50 dark:bg-gray-900 rounded p-3">
+                    <CommentForm ideaId={Ideia.id} />
                 </div>
             )}
         </div>

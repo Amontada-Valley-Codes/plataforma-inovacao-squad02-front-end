@@ -2,6 +2,7 @@ import { CalendarClock } from "lucide-react";
 import Button from "@/components/ui/button/Button";
 import React, { useState } from "react";
 import DetalhesDesafio from "./detailsDesafio";
+import { ChallengeType } from "@/types/challenge";
 
 type cardProps = {
     id: string;
@@ -14,7 +15,7 @@ type cardProps = {
     visibility: 'PUBLIC' | 'INTERNAL';
 };
 
-export default function Card({ id, title, stats, description, startDate, endDate, theme, visibility }: cardProps) {
+export default function Card({ id, title, stats, startDate, endDate, theme, description, visibility }: cardProps) {
     const [isOpen, setIsOpen] = useState(false);
 
     const openDetalhes = () => setIsOpen(true);
@@ -57,16 +58,9 @@ export default function Card({ id, title, stats, description, startDate, endDate
             </div>
             
             <DetalhesDesafio
-                id={id}
+                challenge={{ id, title, stats, startDate, endDate, theme, description, visibility } as ChallengeType}
                 isOpen={isOpen}
                 onClose={closeDetalhes}
-                title={title}
-                stats={stats}
-                description={description}
-                startDate={startDate}
-                endDate={endDate}
-                theme={theme}
-                visibility={visibility}
             />
         </>
     );
