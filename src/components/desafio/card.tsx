@@ -1,4 +1,4 @@
-import { CalendarClock } from "lucide-react";
+import { CalendarClock, Pencil, Trash2 } from "lucide-react";
 import Button from "@/components/ui/button/Button";
 import React, { useState } from "react";
 import DetalhesDesafio from "./detailsDesafio";
@@ -13,9 +13,24 @@ type cardProps = {
     theme: string;
     description: string;
     visibility: 'PUBLIC' | 'INTERNAL';
+    isAdmin?: boolean;
+    onEdit?: () => void;
+    onDelete?: () => void;
 };
 
-export default function Card({ id, title, stats, startDate, endDate, theme, description, visibility }: cardProps) {
+export default function Card({ 
+    id, 
+    title, 
+    stats, 
+    startDate, 
+    endDate, 
+    theme, 
+    description, 
+    visibility, 
+    isAdmin = false,
+    onEdit,
+    onDelete 
+}: cardProps) {
     const [isOpen, setIsOpen] = useState(false);
 
     const openDetalhes = () => setIsOpen(true);
@@ -23,16 +38,20 @@ export default function Card({ id, title, stats, startDate, endDate, theme, desc
 
     return (
         <>
-            <div className="px-4 py-6 max-w-[400px] rounded-2xl border-2 border-orange-200 bg-white dark:bg-gray-900 hover:shadow-lg transition-all duration-300">
+            <div className="px-4 py-6 max-w-[400px] rounded-2xl border-2 border-orange-200 bg-white dark:bg-gray-900 hover:shadow-lg transition-all duration-300 cursor-pointer">
                 <div className="flex justify-between items-center">
-                    <p className="font-bold text-gray-800 dark:text-gray-100">{title}</p>
-                    <p className="px-3 py-1 text-xs text-white bg-gradient-to-r from-orange-500 to-amber-600 rounded-full font-semibold">
-                        {stats}
-                    </p>
+                    <p className="font-bold text-gray-800 dark:text-gray-100 truncate">{title}</p>
+                    <div className="flex items-center gap-2">
+                        <p className="px-3 py-1 text-xs text-white bg-gradient-to-r from-orange-500 to-amber-600 rounded-full font-semibold">
+                            {stats}
+                        </p>
+                    </div>
                 </div>
                 
                 <div className="mt-5">
-                    <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">{description}</p>
+                    <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed line-clamp-2">
+                        {description}
+                    </p>
                 </div>
 
                 <div className="mt-4">
@@ -43,7 +62,11 @@ export default function Card({ id, title, stats, startDate, endDate, theme, desc
                 </div>
 
                 <div className="flex justify-between items-center mt-4">
-                    <p className={`px-3 py-1 rounded-full text-white text-sm font-semibold bg-gradient-to-r ${visibility === "PUBLIC" ? "from-green-500 to-emerald-600" : "from-red-500 to-rose-600"}`}>
+                    <p className={`px-3 py-1 rounded-full text-white text-sm font-semibold bg-gradient-to-r ${
+                        visibility === "PUBLIC" 
+                            ? "from-green-500 to-emerald-600" 
+                            : "from-orange-500 to-orange-600"
+                    }`}>
                         {visibility === "PUBLIC" ? "Público" : "Privado"}
                     </p>
                     <Button 
@@ -61,6 +84,9 @@ export default function Card({ id, title, stats, startDate, endDate, theme, desc
                 challenge={{ id, title, stats, startDate, endDate, theme, description, visibility } as ChallengeType}
                 isOpen={isOpen}
                 onClose={closeDetalhes}
+                isAdmin={isAdmin}
+                onEdit={onEdit}
+                onDelete={onDelete}
             />
         </>
     );
