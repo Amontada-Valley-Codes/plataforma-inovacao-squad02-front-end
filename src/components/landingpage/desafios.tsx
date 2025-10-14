@@ -1,34 +1,55 @@
+'use client'
+import { useState, useEffect } from "react";
+import { useModal } from "@/hooks/useModal";
 import api from "@/services/axiosServices";
-import { useEffect } from "react";
-
 
 export default function desafios() {
-  
+
+  type Desafio = {
+  id: string;
+  name: string;
+  status: string;
+  startDate: string;
+  endDate: string;
+  theme: string;
+  description: string;
+  visibility: "PUBLIC" | "INTERNAL";
+};
+
+
+    const { isOpen, openModal, closeModal } = useModal();
+    const [desafios, setDesafios] = useState<Desafio[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [totalPages, setTotalPages] = useState(1);
+    const [currentPage, setCurrentPage] = useState(1);
 
     useEffect(() => {
-      const fetchDesafios = async () => {
-        setLoading(true);
-        try {
-          const response = await api.get("/public/challenges", {
-            params: {
-              page: 1,
-              limit: 10,
-            },
-          });
-          const desafios = response.data.data; 
-          const total = response.data.total;
-          setDesafios(desafios);
-        } catch (error) {
-          console.error("Erro ao buscar desafios", error);
-          setError("Erro ao carregar desafios.");
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchDesafios();
-    }, []);
+    const fetchDesafios = async () => {
+      setLoading(true);
+      try {
+        const response = await api.get("/public/challenges", {
+          params: {
+            page: currentPage,
+            limit: 9,
+          },
+        });
+        const desafios = response.data.data;
+        setDesafios(desafios);
+        setTotalPages(Math.ceil(response.data.total / response.data.limit));
+      } catch (error) {
+        console.error("Erro ao buscar desafios", error);
+        setError("Erro ao carregar desafios.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDesafios();
+  }, [currentPage]);
 
   return (
+
+    
     <div className="w-full h-auto flex flex-col items-center justify-center px-4">
       <h2 className="font-semibold text-2xl md:text-4xl">Desafios <span className="text-warning-500">Lançados</span></h2>
       <div>
