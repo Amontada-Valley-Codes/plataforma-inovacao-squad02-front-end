@@ -1,5 +1,9 @@
-'use client'
+"use client";
+
+import Image from "next/image"
 import { useState, useEffect } from "react";
+import SearchBar from "@/components/ui/Searchbar";
+import { ThemeToggleButton } from "@/components/common/ThemeToggleButton";
 import PubliCard from "@/components/public-page/public-card";
 import api from "@/services/axiosServices";
 
@@ -27,7 +31,8 @@ type DesafioParaCard = {
   updatedAt: string;
 };
 
-export default function Desafios() {
+export default function Page(){
+  const [searchQuery, setSearchQuery] = useState("");
   const [desafios, setDesafios] = useState<DesafioParaCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -68,7 +73,7 @@ export default function Desafios() {
           }
         }
 
-        // 🔹 PROCESSAR A RESPOSTA (igual na página que funciona)
+        // 🔹 PROCESSAR A RESPOSTA
         let desafiosData = response.data;
         
         // Se a resposta tem estrutura { data: [...] } (como na página interna)
@@ -175,89 +180,153 @@ export default function Desafios() {
   const getDesafiosRealistas = (): DesafioParaCard[] => [
     {
       id: "1",
-      nome: "Otimização de Processos Logísticos",
-      tema: "Logística Inteligente",
-      descricao: "Desenvolver sistema inteligente para rastreamento em tempo real de cargas e previsão de demandas na cadeia logística.",
+      nome: "Automação de Processos Internos",
+      tema: "Amontada Valley",
+      descricao: "Buscando inovações para automatizar processo manuais porque eu quero ver coisas novas",
       privacidade: "PUBLICO",
-      dataInicio: "2024-02-01T00:00:00.000Z",
-      dataFim: "2024-08-31T23:59:59.000Z",
+      dataInicio: "2025-06-13T00:00:00.000Z",
+      dataFim: "2025-12-21T23:59:59.000Z",
       status: "ATIVO",
-      createdAt: "2024-01-15T10:00:00.000Z",
-      updatedAt: "2024-01-15T10:00:00.000Z"
+      createdAt: "2025-01-01T10:00:00.000Z",
+      updatedAt: "2025-01-01T10:00:00.000Z"
     },
     {
       id: "2",
-      nome: "Soluções para Agricultura Sustentável",
-      tema: "AgroTech Verde",
-      descricao: "Criar plataforma de monitoramento de solo e clima para otimizar uso de recursos hídricos e reduzir impacto ambiental.",
+      nome: "Gestão Inteligente de Dados",
+      tema: "Empresa Braga Nunes",
+      descricao: "Procurando formas criativas de organizar grandes volumes de informação legais e bonitas para ter jeito",
       privacidade: "PUBLICO",
-      dataInicio: "2024-03-15T00:00:00.000Z",
-      dataFim: "2024-09-30T23:59:59.000Z",
+      dataInicio: "2025-01-01T00:00:00.000Z",
+      dataFim: "2025-12-12T23:59:59.000Z",
       status: "ATIVO",
-      createdAt: "2024-02-20T14:30:00.000Z",
-      updatedAt: "2024-02-20T14:30:00.000Z"
+      createdAt: "2025-01-01T10:00:00.000Z",
+      updatedAt: "2025-01-01T10:00:00.000Z"
     },
     {
-      id: "3", 
-      nome: "Plataforma de Educação Inclusiva",
-      tema: "EdTech Acessível",
-      descricao: "Desenvolver aplicativo educacional com recursos de acessibilidade para pessoas com deficiência visual e auditiva.",
+      id: "3",
+      nome: "Sustentabilidade no Setor Industrial",
+      tema: "Ypê",
+      descricao: "Projetos voltados para inovação sustentável para uma ecologia bem inovadora e maneira",
       privacidade: "PUBLICO",
-      dataInicio: "2024-01-10T00:00:00.000Z",
-      dataFim: "2024-07-15T23:59:59.000Z",
-      status: "ATIVO",
-      createdAt: "2024-01-05T09:15:00.000Z", 
-      updatedAt: "2024-01-05T09:15:00.000Z"
+      dataInicio: "2025-02-15T00:00:00.000Z",
+      dataFim: "2025-05-05T23:59:59.000Z",
+      status: "INATIVO",
+      createdAt: "2025-01-01T10:00:00.000Z",
+      updatedAt: "2025-01-01T10:00:00.000Z"
     }
   ];
 
-  // Embaralhar e pegar 3 aleatórios
-  const desafiosAleatorios = [...desafios]
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 3);
+  // 🔹 Filtrar desafios pelo nome, tema ou descrição
+  const filteredDesafios = desafios.filter(desafio =>
+    desafio.nome.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    desafio.tema.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    desafio.descricao.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   if (loading) {
     return (
-      <div className="w-full h-auto flex flex-col items-center justify-center px-4">
-        <h2 className="font-semibold text-2xl md:text-4xl pt-23">Desafios <span className="text-warning-500">Lançados</span></h2>
-        <div className="text-gray-600 dark:text-gray-400 text-center mt-3 md:mb-15 mb-6 text-base md:text-xl">
-          Carregando desafios públicos...
-        </div>
-        <div className="flex flex-col md:flex-row gap-6 items-center justify-center">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="w-80 h-64 bg-gray-300 dark:bg-gray-700 rounded-2xl animate-pulse"></div>
-          ))}
-        </div>
+      <div>
+        <header className="flex min-h-screen items-center justify-center flex-col content-center w-full relative pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
+          <div className="flex items-center gap-2 2xsm:gap-3 absolute z-10 right-5 top-[env(safe-area-inset-top)] pt-5">
+            <ThemeToggleButton />
+          </div>
+
+          <div className="flex-1 flex items-center justify-center flex-col px-4 pt-3">
+            <Image
+              src="/hivehub-logobranca.png"
+              alt="Logo Hive Hub"
+              width={260}
+              height={200}
+              className="dark:block hidden w-full max-w-[190px] md:max-w-[300px] h-auto"
+            />
+            
+            <Image
+              src="/hivehub-logopreto.png"
+              alt="Logo Hive Hub"
+              width={260}
+              height={195}
+              className="block dark:hidden w-full max-w-[190px] md:max-w-[300px] h-auto"
+            />
+          </div>
+
+          <h2 className="dark:text-warning-25/80 text-[1.3em] pb-3 font-light italic text-center mt-4">
+            Uma colmeia de ideias
+          </h2>
+
+          <SearchBar onSearch={(query) => setSearchQuery(query)} />
+
+          <div className="text-gray-600 dark:text-gray-400 text-center mt-4">
+            🔄 Carregando desafios...
+          </div>
+
+          <div className="flex gap-1 md:gap-5 items-center justify-center flex-wrap pt-4 pb-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="w-full max-w-[350px] h-[265px] rounded-2xl border bg-gray-300 dark:bg-gray-700 animate-pulse"></div>
+            ))}
+          </div>
+        </header>
       </div>
     );
   }
 
-  return (
-    <div className="w-full h-auto flex flex-col items-center justify-center px-4 pt-23">
-      <h2 className="font-semibold text-2xl md:text-4xl">Desafios <span className="text-warning-500">Lançados</span></h2>
-      <div className="text-gray-600 dark:text-gray-400 text-center mt-3 md:mb-15 mb-6 text-base md:text-xl">
-        Veja desafios lançados publicamente por startups
-      </div>
+  return(
+    <div>
+      <header className="flex min-h-screen items-center justify-center flex-col content-center w-full relative pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
+        {/* <div className="flex items-center gap-2 2xsm:gap-3 absolute z-10 right-5 top-[env(safe-area-inset-top)] pt-5">
+          <ThemeToggleButton />
+        </div> */}
 
-      {error && (
-        <div className="mb-6 text-center">
-          <div className="text-sm text-yellow-700 bg-yellow-100 px-4 py-2 rounded-lg max-w-md">
-            ⚠️ {error}
-          </div>
+        <div className="flex-1 flex items-center justify-center flex-col px-4 pt-3">
+          <Image
+            src="/hivehub-logobranca.png"
+            alt="Logo Hive Hub"
+            width={260}
+            height={200}
+            className="dark:block hidden w-full max-w-[190px] md:max-w-[300px] h-auto"
+          />
+          
+          <Image
+            src="/hivehub-logopreto.png"
+            alt="Logo Hive Hub"
+            width={260}
+            height={195}
+            className="block dark:hidden w-full max-w-[190px] md:max-w-[300px] h-auto"
+          />
         </div>
-      )}
 
-      <div className="flex flex-col md:flex-row gap-6 items-center justify-center w-full max-w-6xl">
-        {desafiosAleatorios.map((desafio) => (
-          <PubliCard key={desafio.id} desafio={desafio} />
-        ))}
-      </div>
+        <h2 className="dark:text-warning-25/80 text-[1.3em] pb-3 font-light italic text-center mt-4">
+          Uma colmeia de ideias
+        </h2>
 
-      <div className="my-8 border-b-2 w-full border-warning-500 py-6 flex justify-center">
-        <button className="bg-warning-500 hover:shadow-lg transition-all duration-300 transform hover:scale-105 hover:bg-warning-400 text-white py-2 px-4 rounded-md">
-          <a href="/desafios-publicos">Ver Mais Desafios</a>
-        </button>
-      </div>
+        <SearchBar onSearch={(query) => setSearchQuery(query)} />
+
+        {/* Mensagem de erro */}
+        {error && (
+          <div className="mt-4 text-center">
+            <div className="text-sm text-yellow-700 bg-yellow-100 px-4 py-2 rounded-lg max-w-md mx-auto">
+              ⚠️ {error}
+            </div>
+          </div>
+        )}
+
+        <div className="flex gap-1 md:gap-5 items-center justify-center flex-wrap pt-4 pb-4">
+          {filteredDesafios.length > 0 ? (
+            [...filteredDesafios]
+              .sort(() => Math.random() - 0.5) // embaralha
+              .slice(0, 3) // pega só 3
+              .map((desafio) => (
+                <PubliCard
+                  key={desafio.id}
+                  desafio={desafio}
+                />
+              ))
+          ) : (
+            <p className="text-black dark:text-white text-center p-4">
+              {searchQuery ? "Nenhum desafio encontrado para sua busca" : "Nenhum desafio público disponível"}
+            </p>
+          )}
+        </div>
+      </header>
     </div>
-  );
+  )
 }

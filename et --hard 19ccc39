@@ -1,0 +1,90 @@
+[33mcommit c0edc89400599b91f8736c84a14aada79ca8f5ff[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mpublicc[m[33m)[m
+Author: Jovic_Penhaz <victosousa92@gmail.com>
+Date:   Tue Sep 30 21:49:25 2025 -0300
+
+    update: header
+
+ src/components/header/UserDropdown.tsx     |  2 [32m+[m[31m-[m
+ src/components/public-page/public-card.tsx |  2 [32m+[m[31m-[m
+ src/layout/AppHeader.tsx                   | 94 [32m+++++[m[31m-------------------------[m
+ src/layout/AppSidebar.tsx                  | 10 [32m+[m[31m---[m
+ 4 files changed, 20 insertions(+), 88 deletions(-)
+
+[33mcommit cb84263dd10b37723ff5e817cb0db7a538350497[m
+Author: Jovic_Penhaz <victosousa92@gmail.com>
+Date:   Tue Sep 30 19:15:47 2025 -0300
+
+    feat: pagina publica + card e searchbar
+
+ public/fonts/Neuropolitical.otf                | Bin [31m0[m -> [32m36412[m bytes
+ src/app/(full-width-pages)/site/page.tsx       | 157 [32m+++++++++++++++[m[31m----------[m
+ src/app/globals.css                            |   8 [32m+[m[31m-[m
+ src/components/desafio/card.tsx                |  32 [32m++[m[31m---[m
+ src/components/ecommerce/MonthlySalesChart.tsx |   2 [32m+[m[31m-[m
+ src/components/ecommerce/MonthlyTarget.tsx     |   2 [32m+[m[31m-[m
+ src/components/public-page/public-card.tsx     |  38 [32m++++++[m
+ src/components/ui/Searchbar.tsx                |   2 [32m+[m[31m-[m
+ src/components/ui/badge/Badge.tsx              |  16 [32m+[m[31m--[m
+ 9 files changed, 170 insertions(+), 87 deletions(-)
+
+[33mcommit 8f79eceb4ec318b39331f83201015aca96ecece7[m
+Author: Jovic_Penhaz <victosousa92@gmail.com>
+Date:   Wed Sep 24 21:56:49 2025 -0300
+
+    feat: landing page
+
+ public/headerbg.webp                     | Bin [31m0[m -> [32m303864[m bytes
+ src/app/(full-width-pages)/site/page.tsx |  74 [32m+++++++++++++++++++++++++++++++[m
+ src/app/globals.css                      |  13 [32m++++++[m
+ src/components/desafio/card.tsx          |   8 [32m++[m[31m--[m
+ src/components/ui/Searchbar.tsx          |  38 [32m++++++++++++++++[m
+ src/layout/AppHeader.tsx                 |   2 [32m+[m[31m-[m
+ src/layout/AppSidebar.tsx                |   2 [32m+[m[31m-[m
+ 7 files changed, 132 insertions(+), 5 deletions(-)
+
+[33mcommit 9093438003971ea73530504a40f8362924b51bc4[m[33m ([m[1;32madjust[m[33m)[m
+Merge: 9fe70ee 55e700d
+Author: Davi Castro <163475173+Davi-santos16@users.noreply.github.com>
+Date:   Wed Sep 24 18:06:04 2025 -0300
+
+    Merge pull request #3 from Davi-santos16/adjust
+    
+    Adjust
+
+[33mcommit 55e700d98bb12357a7c1f56fa761a7a072f25f36[m[33m ([m[1;31morigin/adjust[m[33m)[m
+Author: Jovic_Penhaz <victosousa92@gmail.com>
+Date:   Tue Sep 23 21:58:22 2025 -0300
+
+    update: icons and logo
+
+ src/layout/AppHeader.tsx  |  2 [32m+[m[31m-[m
+ src/layout/AppSidebar.tsx | 13 [32m+++++++++[m[31m----[m
+ 2 files changed, 10 insertions(+), 5 deletions(-)
+
+[33mcommit 1ddeee8837c8c077a7bd3e3f2b638cea31a24a14[m
+Author: Jovic_Penhaz <victosousa92@gmail.com>
+Date:   Tue Sep 23 08:55:52 2025 -0300
+
+    update: new icons, favicon, logo
+
+ public/HiveHub-logobranca.png | Bin [31m0[m -> [32m143043[m bytes
+ public/HiveHub-logopreto.png  | Bin [31m0[m -> [32m137523[m bytes
+ public/hivehub-icon.png       | Bin [31m0[m -> [32m307338[m bytes
+ src/app/(admin)/page.tsx      |   7 [32m+++++[m[31m--[m
+ src/app/favicon.ico           | Bin [31m15406[m -> [32m17888[m bytes
+ src/app/layout.tsx            |   2 [32m+[m[31m-[m
+ src/layout/AppHeader.tsx      |   6 [32m+++[m[31m---[m
+ src/layout/AppSidebar.tsx     |  12 [32m++++++[m[31m------[m
+ 8 files changed, 15 insertions(+), 12 deletions(-)
+
+[33mcommit 9fe70ee1a293f93a66f627a925a73aa87eccf4bb[m
+Author: davi <davicastro213@gmail.com>
+Date:   Mon Sep 22 20:56:02 2025 -0300
+
+    feat:atualizaçao
+
+ src/app/(admin)/(others-pages)/desafio/page.tsx |  4 [32m++[m[31m--[m
+ src/app/(admin)/(others-pages)/ideias/page.tsx  |  2 [32m+[m[31m-[m
+ src/components/desafio/card.tsx                 | 10 [32m+++++[m[31m-----[m
+ src/layout/AppSidebar.tsx                       |  1 [32m+[m
+ 4 files changed, 9 insertions(+), 8 deletions(-)
