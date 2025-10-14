@@ -13,7 +13,7 @@ const doubledLogos = [...logos, ...logos];
 
 export default function Carrossel() {
   return (
-    <section className="py-12 dark:bg-gray-800 overflow-hidden">
+    <section className="py-16 dark:bg-gray-800 overflow-hidden">
       <div className="mx-auto max-w-7xl px-4">
         <div className="text-center mb-8">
             <h2 className="font-semibold text-2xl md:text-4xl">
