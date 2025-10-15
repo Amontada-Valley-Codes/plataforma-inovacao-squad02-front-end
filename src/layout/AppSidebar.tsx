@@ -51,7 +51,7 @@ const AppSidebar: React.FC = () => {
     if (userRole === "ADMIN") 
       return [ "Desafio", "Perfil","Dashboard","Startups","Funil de inovações","Usuários","Empresa"].includes(item.name);
     if (userRole === "MANAGER")
-      return ["Usuários","Desafio","Perfil","Dashboard"].includes(item.name);
+      return ["Usuários","Desafio","Perfil","Dashboard","Funil de inovações"].includes(item.name);
     if (userRole === "EVALUATOR")
       return ["Dashboard", "Desafio", "Startups", "Perfil"].includes(item.name);
     if (userRole === "COMMON")
