@@ -6,6 +6,7 @@ import { Modal } from "@/components/ui/modal";
 import { useModal } from "@/hooks/useModal";
 import React, { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
+import { getUserRole } from "@/utils/getUserRole";
 
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,7 +14,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "@/components/ui/button/Button";
 import DatePicker from "@/components/form/date-picker";
 import TextArea from "@/components/form/input/TextArea";
-import { Lightbulb } from "lucide-react";
+import { Lightbulb, Pencil, Trash2 } from "lucide-react";
 import Card from "@/components/desafio/card";
 import api from "@/services/axiosServices";
 import {
@@ -24,7 +25,8 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
-
+import Swal from "sweetalert2";
+import { fi } from "zod/v4/locales";
 
 const formSchema = z
   .object({
@@ -55,11 +57,19 @@ type Desafio = {
 
 export default function Page() {
   const { isOpen, openModal, closeModal } = useModal();
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const [desafios, setDesafios] = useState<Desafio[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
+  const [roleState, setRoleState] = useState<string | null>(null);
+  const [editingDesafio, setEditingDesafio] = useState<Desafio | null>(null);
+
+  useEffect(() => {
+    const userRole = getUserRole();
+    setRoleState(userRole);
+  }, []);
 
   const {
     control,
@@ -78,6 +88,17 @@ export default function Page() {
     },
   });
 
+  // Form específico para edição
+  const {
+    control: editControl,
+    register: editRegister,
+    handleSubmit: handleEditSubmit,
+    reset: editReset,
+    formState: { errors: editErrors },
+  } = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+  });
+
   function formatDate(date: Date) {
     return date.toISOString().split("T")[0];
   }
@@ -92,14 +113,118 @@ export default function Page() {
 
     try {
       const response = await api.post("/internal/challenges", payload);
+      Swal.fire({
+        title: "Sucesso!",
+        text: "Desafio cadastrado com sucesso.",
+        icon: "success",
+        confirmButtonText: "OK",
+        customClass: {
+          container: "z-[9999]"
+        }
+      });
       console.log("Desafio cadastrado:", response.data);
       setDesafios((prev) => [...prev, response.data]);
+      reset();
+      closeModal();
     } catch (error) {
       console.error("Erro ao cadastrar", error);
       setError("Erro ao criar desafio. Tente novamente.");
     }
-    reset();
-    closeModal();
+  };
+
+  const onEdit = async (data: FormData) => {
+    if (!editingDesafio) return;
+    setError(null);
+    const payload = {
+      ...data,
+      startDate: formatDate(data.startDate),
+      endDate: formatDate(data.endDate),
+    };
+
+    try {
+      const response = await api.put(`/internal/challenges/${editingDesafio.id}`, payload);
+      Swal.fire({
+        title: "Sucesso!",
+        text: "Desafio atualizado com sucesso.",
+        icon: "success",
+        confirmButtonText: "OK",
+        customClass: {
+          container: "z-[9999]"
+        }
+      });
+      console.log("Desafio atualizado:", response.data);
+      // Atualiza a lista localmente
+      setDesafios(prev =>
+        prev.map(desafio =>
+          desafio.id === editingDesafio.id ? response.data : desafio
+        )
+      );
+      setEditModalOpen(false); // fecha o modal de edição
+      setEditingDesafio(null);
+      editReset(); // reseta o formulário de edição
+      closeModal()
+    } catch (error) {
+      console.error("Erro ao atualizar", error);
+      setError("Erro ao atualizar desafio. Tente novamente.");
+    }
+  };
+
+  const onDelete = async (id: string) => {
+    const result = await Swal.fire({
+      title: "Tem certeza?",
+      text: "Essa ação não pode ser desfeita!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#ef4444",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Sim, excluir",
+      cancelButtonText: "Cancelar",
+      customClass: {
+        container: "z-[9999] "
+      }
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
+
+    try {
+      await api.delete(`/internal/challenges/${id}`);
+      // Remove da lista localmente
+      setDesafios(prev => prev.filter(desafio => desafio.id !== id));
+    } catch (error) {
+      console.error("Erro ao excluir", error);
+      setError("Erro ao excluir desafio. Tente novamente.");
+    } finally {
+      Swal.fire({
+        title: "Excluído!",
+        text: "O desafio foi excluído.",
+        icon: "success",
+        confirmButtonText: "OK",
+        customClass: {
+          container: "z-[9999]"
+        }
+      });
+      closeModal();
+    }
+  };
+
+  const openEditModal = (desafio: Desafio) => {
+    setEditingDesafio(desafio);
+    editReset({
+      name: desafio.name,
+      theme: desafio.theme,
+      description: desafio.description,
+      startDate: new Date(desafio.startDate),
+      endDate: new Date(desafio.endDate),
+      visibility: desafio.visibility,
+    });
+    setEditModalOpen(true);
+  };
+
+  const closeEditModal = () => {
+    setEditModalOpen(false);
+    setEditingDesafio(null);
   };
 
   useEffect(() => {
@@ -109,7 +234,7 @@ export default function Page() {
         const response = await api.get("/internal/challenges", {
           params: {
             page: currentPage,
-            limit: 9,
+            limit: 15,
           },
         });
         const desafios = response.data.data;
@@ -135,13 +260,15 @@ export default function Page() {
 
   return (
     <div>
-      <div className="px-3 py-5  rounded-2xl">
+      <div className="px-3 py-5 rounded-2xl">
         <div className="flex justify-between items-center">
-          <p className="text-2xl">Desafio</p>
-          <Button onClick={openModal} size="sm" variant="primary">
-            <Lightbulb size={20} />
-            Criar Desafio
-          </Button>
+          <p className="text-2xl">Desafios</p>
+          {roleState === 'MANAGER' && (
+            <Button onClick={openModal} size="sm" variant="primary">
+              <Lightbulb size={20} />
+              Criar Desafio
+            </Button>
+          )}
         </div>
       </div>
 
@@ -160,27 +287,29 @@ export default function Page() {
           </div>
         ) : (
           <>
-            <Pagination>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {desafios.map((desafio) => (
-                  <Card
-                    key={desafio.id}
-                    id={desafio.id}
-                    title={desafio.name}
-                    description={desafio.description}
-                    stats={desafio.status}
-                    startDate={new Date(desafio.startDate).toLocaleDateString()}
-                    endDate={
-                      desafio.endDate
-                        ? new Date(desafio.endDate).toLocaleDateString()
-                        : ""
-                    }
-                    theme={desafio.theme}
-                    visibility={desafio.visibility}
-                  />
-                ))}
-              </div>
-            </Pagination>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {desafios.map((desafio) => (
+                <Card
+                  key={desafio.id}
+                  id={desafio.id}
+                  title={desafio.name}
+                  description={desafio.description}
+                  status={desafio.status}
+                  startDate={new Date(desafio.startDate).toLocaleDateString()}
+                  endDate={
+                    desafio.endDate
+                      ? new Date(desafio.endDate).toLocaleDateString()
+                      : ""
+                  }
+                  theme={desafio.theme}
+                  visibility={desafio.visibility}
+                  funnelStage="jh"
+                  isAdmin={roleState === 'MANAGER'}
+                  onEdit={() => openEditModal(desafio)}
+                  onDelete={() => onDelete(desafio.id)}
+                />
+              ))}
+            </div>
 
             <div className="mt-6 flex justify-center">
               <Pagination>
@@ -217,6 +346,7 @@ export default function Page() {
         )}
       </div>
 
+      {/* Modal de Criar Desafio */}
       <div>
         <Modal isOpen={isOpen} onClose={closeModal}>
           <ComponentCard title="Criar um novo desafio">
@@ -276,7 +406,7 @@ export default function Page() {
                 <div>
                   <Label>Tema:</Label>
                   <Input
-                    placeholder="Digite seu nome"
+                    placeholder="Digite o tema"
                     type="text"
                     {...register("theme")}
                   />
@@ -286,7 +416,7 @@ export default function Page() {
                 </div>
 
                 <div>
-                  <Label>Descriçao</Label>
+                  <Label>Descrição</Label>
                   <Controller
                     control={control}
                     name="description"
@@ -308,13 +438,13 @@ export default function Page() {
                 </div>
 
                 <div>
-                  <Label>selecione</Label>
+                  <Label>Visibilidade</Label>
                   <select
-                    className="px-5 py-2 w-full border rounded  "
+                    className="px-5 py-2 w-full border rounded"
                     {...register("visibility")}
                   >
-                    <option value="">selecione um</option>
-                    <option value="PUBLIC">Publico</option>
+                    <option value="">Selecione uma opção</option>
+                    <option value="PUBLIC">Público</option>
                     <option value="INTERNAL">Interno</option>
                   </select>
                   {errors.visibility && (
@@ -323,7 +453,122 @@ export default function Page() {
                 </div>
 
                 <Button className="w-full mt-2" size="sm">
-                  Enviar
+                  Criar Desafio
+                </Button>
+              </div>
+            </form>
+          </ComponentCard>
+        </Modal>
+      </div>
+
+      {/* Modal de Editar Desafio */}
+      <div>
+        <Modal isOpen={editModalOpen} onClose={closeEditModal}>
+          <ComponentCard title="Editar desafio">
+            <form onSubmit={handleEditSubmit(onEdit)}>
+              {error && <div className="text-red-600">{error}</div>}
+              <div className="px-6 space-y-5">
+                <div>
+                  <Label>Nome:</Label>
+                  <Input
+                    placeholder="Digite o nome do desafio"
+                    type="text"
+                    {...editRegister("name")}
+                  />
+                  {editErrors.name && (
+                    <span className="text-red-600">{editErrors.name.message}</span>
+                  )}
+                </div>
+
+                <div>
+                  <Controller
+                    control={editControl}
+                    name="startDate"
+                    render={({ field }) => (
+                      <DatePicker
+                        id="edit-date-picker"
+                        label="Data de início"
+                        placeholder="Selecione uma data"
+                        defaultDate={field.value}
+                        onChange={(dates) => field.onChange(dates[0])}
+                      />
+                    )}
+                  />
+                  {editErrors.startDate && (
+                    <span className="text-red-600">{editErrors.startDate.message}</span>
+                  )}
+                </div>
+
+                <div>
+                  <Controller
+                    control={editControl}
+                    name="endDate"
+                    render={({ field }) => (
+                      <DatePicker
+                        id="edit-date-final"
+                        label="Data final"
+                        placeholder="Selecione uma data"
+                        defaultDate={field.value}
+                        onChange={(dates) => field.onChange(dates[0])}
+                      />
+                    )}
+                  />
+                  {editErrors.endDate && (
+                    <span className="text-red-600">{editErrors.endDate.message}</span>
+                  )}
+                </div>
+
+                <div>
+                  <Label>Tema:</Label>
+                  <Input
+                    placeholder="Digite o tema"
+                    type="text"
+                    {...editRegister("theme")}
+                  />
+                  {editErrors.theme && (
+                    <span className="text-red-600">{editErrors.theme.message}</span>
+                  )}
+                </div>
+
+                <div>
+                  <Label>Descrição</Label>
+                  <Controller
+                    control={editControl}
+                    name="description"
+                    render={({ field }) => (
+                      <TextArea
+                        className="text-gray-950"
+                        rows={6}
+                        placeholder="Digite uma descrição"
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                      />
+                    )}
+                  />
+                  {editErrors.description && (
+                    <span className="text-red-600">
+                      {editErrors.description.message}
+                    </span>
+                  )}
+                </div>
+
+                <div>
+                  <Label>Visibilidade</Label>
+                  <select
+                    className="px-5 py-2 w-full border rounded"
+                    {...editRegister("visibility")}
+                  >
+                    <option value="">Selecione uma opção</option>
+                    <option value="PUBLIC">Público</option>
+                    <option value="INTERNAL">Interno</option>
+                  </select>
+                  {editErrors.visibility && (
+                    <span className="text-red-600">{editErrors.visibility.message}</span>
+                  )}
+                </div>
+
+                <Button className="w-full mt-2" size="sm">
+                  Atualizar Desafio
                 </Button>
               </div>
             </form>

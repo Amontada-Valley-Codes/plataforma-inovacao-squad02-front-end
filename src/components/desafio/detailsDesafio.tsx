@@ -1,19 +1,24 @@
 import { useContext, useEffect, useState } from "react";
 import { Modal } from "@/components/ui/modal";
-import Ideias from "./Ideias";
-import { Calendar, Eye, Globe, Lock, Tag } from "lucide-react";
+import Ideias from "./ideias";
+import { Calendar, Eye, Globe, Lock, Tag, Pencil, Trash2, Funnel } from "lucide-react";
 import api from "@/services/axiosServices";
 import { IdeiaType } from "@/types/ideia";
 import { ThemeContext } from "@/context/ThemeContext";
 import { ChallengeType } from "@/types/challenge";
+import Button from "@/components/ui/button/Button";
+import desafios from "../landingpage/desafios";
 
 type Props = {
     challenge: ChallengeType;
     isOpen: boolean;
     onClose: () => void;
+    isAdmin?: boolean;
+    onEdit?: () => void;
+    onDelete?: () => void;
 };
 
-export default function DetalhesDesafio({challenge, isOpen, onClose}: Props) {
+export default function DetalhesDesafio({ challenge, isOpen, onClose, isAdmin = false, onEdit, onDelete }: Props) {
     const themeContext = useContext(ThemeContext);
     if (!themeContext) {
         throw new Error("ThemeContext must be used within a ThemeProvider");
@@ -28,7 +33,6 @@ export default function DetalhesDesafio({challenge, isOpen, onClose}: Props) {
                 .catch(() => setIdeias([]));
         }
     }, [isOpen, challenge.id]);
-    console.log(ideias);
 
     const getStatusColor = (status: string) => {
         const statusLower = status.toLowerCase();
@@ -44,12 +48,39 @@ export default function DetalhesDesafio({challenge, isOpen, onClose}: Props) {
         return currentTheme === 'dark' ? 'bg-gradient-to-r from-orange-700 to-amber-800' : 'bg-gradient-to-r from-orange-500 to-amber-600';
     };
 
+    const handleDelete = () => {
+        if (onDelete) {
+            onDelete();
+            onClose();
+        }
+    };
+
     return (
-        <Modal isOpen={isOpen} onClose={onClose}>
-            <div className={`bg-gradient-to-br ${currentTheme === 'dark' ? 'from-gray-800 to-gray-900' : 'from-white to-orange-50'} rounded-t-2xl`}>
-                {/* Header com gradiente */}
-                <div className={`bg-gradient-to-r ${currentTheme === 'dark' ? 'from-gray-700 to-gray-800' : 'from-orange-500 to-amber-600'} px-6 py-5 rounded-t-2xl`}>
-                    <h2 className={`text-2xl font-bold ${currentTheme === 'dark' ? 'text-gray-200' : 'text-white'}`}>{challenge.title}</h2>
+        <Modal isOpen={isOpen} onClose={onClose} className="bg-transparent">
+            <div className={`bg-gradient-to-br ${currentTheme === 'dark' ? 'from-gray-800 to-gray-900' : 'from-white to-gray-50'} rounded-t-2xl`}>
+                {/* Header com gradiente e botões de admin */}
+                <div className={`bg-gradient-to-r ${currentTheme === 'dark' ? 'from-gray-700 to-gray-800' : 'from-orange-500 to-amber-600'} px-6 py-5 rounded-t-2xl flex justify-between items-center`}>
+                    <h2 className={`text-2xl font-bold truncate ${currentTheme === 'dark' ? 'text-gray-200' : 'text-white'}`}>{challenge.title}</h2>
+                    {isAdmin && (
+                        <div className="flex gap-2">
+                            <Button
+                                onClick={onEdit}
+                                size="sm"
+                                className="bg-white/20 hover:bg-white/30 text-white border-white/30"
+                            >
+                                <Pencil size={16} />
+                                Editar
+                            </Button>
+                            <Button
+                                onClick={handleDelete}
+                                size="sm"
+                                className="bg-red-500/20 hover:bg-red-500/30 text-white border-red-300/30"
+                            >
+                                <Trash2 size={16} />
+                                Excluir
+                            </Button>
+                        </div>
+                    )}
                 </div>
 
                 {/* Conteúdo */}
@@ -60,8 +91,8 @@ export default function DetalhesDesafio({challenge, isOpen, onClose}: Props) {
                             <Eye className={`w-4 h-4 ${currentTheme === 'dark' ? 'text-gray-400' : 'text-orange-600'}`} />
                             <span className={`font-semibold ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Status:</span>
                         </div>
-                        <span className={`${getStatusColor(challenge.stats)} px-4 py-2 rounded-lg text-white text-sm font-semibold shadow-sm`}>
-                            {challenge.stats}
+                        <span className={`${getStatusColor(challenge.status)} px-4 py-2 rounded-lg text-white text-sm font-semibold shadow-sm`}>
+                            {challenge.status}
                         </span>
                     </div>
 
@@ -110,7 +141,7 @@ export default function DetalhesDesafio({challenge, isOpen, onClose}: Props) {
             </div>
 
             {/* Seção de Ideias */}
-            <div className={`border-t-2 ${currentTheme === 'dark' ? 'border-gray-600 bg-gray-800' : 'border-orange-100 bg-gradient-to-br from-orange-50 to-amber-50'}`}>
+            <div className={`border-t-2 $} ${challenge.funnelStage == "IDEATION"? 'block':'hidden'} ${currentTheme === 'dark' ? 'border-gray-600 bg-gray-800' : 'border-orange-100 bg-gradient-to-br from-orange-50 to-amber-50'}`}>
                 <Ideias ideias={ideias} challengeId={challenge.id} />
             </div>
         </Modal>
