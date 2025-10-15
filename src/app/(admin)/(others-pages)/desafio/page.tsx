@@ -25,6 +25,8 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
+import Swal from "sweetalert2";
+import { fi } from "zod/v4/locales";
 
 const formSchema = z
   .object({
@@ -111,6 +113,15 @@ export default function Page() {
 
     try {
       const response = await api.post("/internal/challenges", payload);
+      Swal.fire({
+        title: "Sucesso!",
+        text: "Desafio cadastrado com sucesso.",
+        icon: "success",
+        confirmButtonText: "OK",
+        customClass: {
+          container: "z-[9999]"
+        }
+      });
       console.log("Desafio cadastrado:", response.data);
       setDesafios((prev) => [...prev, response.data]);
       reset();
@@ -132,15 +143,26 @@ export default function Page() {
 
     try {
       const response = await api.put(`/internal/challenges/${editingDesafio.id}`, payload);
+      Swal.fire({
+        title: "Sucesso!",
+        text: "Desafio atualizado com sucesso.",
+        icon: "success",
+        confirmButtonText: "OK",
+        customClass: {
+          container: "z-[9999]"
+        }
+      });
       console.log("Desafio atualizado:", response.data);
       // Atualiza a lista localmente
-      setDesafios(prev => 
-        prev.map(desafio => 
+      setDesafios(prev =>
+        prev.map(desafio =>
           desafio.id === editingDesafio.id ? response.data : desafio
         )
       );
-      setEditModalOpen(false);
+      setEditModalOpen(false); // fecha o modal de edição
       setEditingDesafio(null);
+      editReset(); // reseta o formulário de edição
+      closeModal()
     } catch (error) {
       console.error("Erro ao atualizar", error);
       setError("Erro ao atualizar desafio. Tente novamente.");
@@ -148,7 +170,21 @@ export default function Page() {
   };
 
   const onDelete = async (id: string) => {
-    if (!confirm("Tem certeza que deseja excluir este desafio?")) {
+    const result = await Swal.fire({
+      title: "Tem certeza?",
+      text: "Essa ação não pode ser desfeita!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#ef4444",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Sim, excluir",
+      cancelButtonText: "Cancelar",
+      customClass: {
+        container: "z-[9999] "
+      }
+    });
+
+    if (!result.isConfirmed) {
       return;
     }
 
@@ -159,6 +195,17 @@ export default function Page() {
     } catch (error) {
       console.error("Erro ao excluir", error);
       setError("Erro ao excluir desafio. Tente novamente.");
+    } finally {
+      Swal.fire({
+        title: "Excluído!",
+        text: "O desafio foi excluído.",
+        icon: "success",
+        confirmButtonText: "OK",
+        customClass: {
+          container: "z-[9999]"
+        }
+      });
+      closeModal();
     }
   };
 
@@ -247,7 +294,7 @@ export default function Page() {
                   id={desafio.id}
                   title={desafio.name}
                   description={desafio.description}
-                  stats={desafio.status}
+                  status={desafio.status}
                   startDate={new Date(desafio.startDate).toLocaleDateString()}
                   endDate={
                     desafio.endDate
@@ -256,6 +303,7 @@ export default function Page() {
                   }
                   theme={desafio.theme}
                   visibility={desafio.visibility}
+                  funnelStage="jh"
                   isAdmin={roleState === 'MANAGER'}
                   onEdit={() => openEditModal(desafio)}
                   onDelete={() => onDelete(desafio.id)}

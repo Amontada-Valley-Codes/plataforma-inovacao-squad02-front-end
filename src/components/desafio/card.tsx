@@ -7,12 +7,13 @@ import { ChallengeType } from "@/types/challenge";
 type cardProps = {
     id: string;
     title: string;
-    stats: string;
+    status: string;
     startDate: string;
     endDate: string;
     theme: string;
     description: string;
     visibility: 'PUBLIC' | 'INTERNAL';
+    funnelStage: string;
     isAdmin?: boolean;
     onEdit?: () => void;
     onDelete?: () => void;
@@ -21,12 +22,13 @@ type cardProps = {
 export default function Card({ 
     id, 
     title, 
-    stats, 
+    status, 
     startDate, 
     endDate, 
     theme, 
     description, 
     visibility, 
+    funnelStage,
     isAdmin = false,
     onEdit,
     onDelete 
@@ -43,7 +45,7 @@ export default function Card({
                     <p className="font-bold text-gray-800 dark:text-gray-100 truncate">{title}</p>
                     <div className="flex items-center gap-2">
                         <p className="px-3 py-1 text-xs text-white bg-gradient-to-r from-orange-500 to-amber-600 rounded-full font-semibold">
-                            {stats}
+                            {status}
                         </p>
                     </div>
                 </div>
@@ -81,7 +83,7 @@ export default function Card({
             </div>
             
             <DetalhesDesafio
-                challenge={{ id, title, stats, startDate, endDate, theme, description, visibility } as ChallengeType}
+                challenge={{ id, title, status, startDate, endDate, theme, funnelStage, description, visibility } as ChallengeType}
                 isOpen={isOpen}
                 onClose={closeDetalhes}
                 isAdmin={isAdmin}

@@ -862,6 +862,27 @@ span.flatpickr-weekday,
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* global.css */
+::-webkit-scrollbar {
+  width: 6px; /* largura da barra vertical */
+  height: 6px; /* altura da barra horizontal */
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* cor de fundo */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ff8c3a; /* cor do "thumb" (laranja Tailwind) */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #f8732c; /* cor ao passar o mouse */
+}
+
+
 /*
   ---break---
 */
