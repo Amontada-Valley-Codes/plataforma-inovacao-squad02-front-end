@@ -1,4 +1,4 @@
-import Ideia from "./Ideia";
+import Ideia from "./ideia";
 import { IdeiaType } from "@/types/ideia";
 import FormIdea from "./FormIdea";
 import { useState } from "react";
