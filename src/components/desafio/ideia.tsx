@@ -101,7 +101,7 @@ export default function Ideia({ Ideia, funnelStage }: Props) {
                         </span>
                     </button>
                     <button
-                        className={` ${funnelStage == 'IDEATION'|| funnelStage == 'DETAILED_SCREENING' ? 'flex items-center gap-1 text-gray-500 dark:text-gray-300 hover:text-orange-600 transition-colors' : 'hidden'}`}
+                        className={` ${funnelStage == 'IDEATION'? 'flex items-center gap-1 text-gray-500 dark:text-gray-300 hover:text-orange-600 transition-colors' : 'hidden'}`}
                         onClick={handleAddCommentClick}
                     >
                         <PlusCircle size={18} />

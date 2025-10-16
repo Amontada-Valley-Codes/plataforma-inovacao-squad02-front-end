@@ -66,7 +66,7 @@ export default function Page(){
     useEffect(() => {
         const fetchEmpresas = async () => {
           try {
-            const res = await api.get("/users/company");
+            const res = await api.get("/users/company/users");
             setUsuarios(res.data); 
             console.log("usuarios da empresa:", res.data);
           } catch (erro) {

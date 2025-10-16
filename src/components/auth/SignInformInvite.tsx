@@ -61,7 +61,7 @@ export default function SignInFormInvite(){
     return(
         <div className="flex justify-center items-center w-full">
           <form onSubmit={handleSubmit(onSubimit)} className="w-full max-w-md px-3 space-y-8">
-            <div className="bg-white rounded-3xl py-10 space-y-8">
+            <div className="bg-white dark:bg-gray-800 rounded-3xl py-10 space-y-8 p-5">
               <div className="flex justify-center">
                 <Image
                     src="/HiveHub-logopreto.png"

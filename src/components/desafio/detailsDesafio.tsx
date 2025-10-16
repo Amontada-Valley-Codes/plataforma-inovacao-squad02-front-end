@@ -7,7 +7,6 @@ import { IdeiaType } from "@/types/ideia";
 import { ThemeContext } from "@/context/ThemeContext";
 import { ChallengeType } from "@/types/challenge";
 import Button from "@/components/ui/button/Button";
-import { ca } from "zod/v4/locales";
 
 type Props = {
     challenge: ChallengeType;
@@ -166,7 +165,7 @@ export default function DetalhesDesafio({ challenge, isOpen, onClose, isAdmin = 
             </div>
 
             {/* Seção de Ideias */}
-            <div className={`border-t-2 ${challenge.funnelStage == "IDEATION" || "DETAILED_SCREENING" ? 'block' : 'hidden'} ${currentTheme === 'dark' ? 'border-gray-600 bg-gray-800' : 'border-orange-100 bg-gradient-to-br from-orange-50 to-amber-50'}`}>
+            <div className={`border-t-2 ${challenge.funnelStage === "IDEATION" || challenge.funnelStage === "DETAILED_SCREENING" || challenge.funnelStage === "EXPERIMENTATION" ? 'block' : 'hidden'} ${currentTheme === 'dark' ? 'border-gray-600 bg-gray-800' : 'border-orange-100 bg-gradient-to-br from-orange-50 to-amber-50'}`}>
                 <Ideias ideias={ideias} challengeId={challenge.id} funnelStage={challenge.funnelStage} />
             </div>
         </Modal>

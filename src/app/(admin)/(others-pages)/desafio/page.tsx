@@ -264,12 +264,10 @@ export default function Page() {
       <div className="px-3 py-5 rounded-2xl">
         <div className="flex justify-between items-center">
           <p className="text-2xl">Desafios</p>
-          {roleState === 'MANAGER' && (
             <Button onClick={openModal} size="sm" variant="primary">
               <Lightbulb size={20} />
               Criar Desafio
             </Button>
-          )}
         </div>
       </div>
 
@@ -279,12 +277,12 @@ export default function Page() {
             {error}
           </div>
         ) : !loading && desafios.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-2xl shadow-md border-2 border-dashed border-orange-200">
-            <Lightbulb className="w-16 h-16 mx-auto text-orange-300 mb-4" />
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">
+          <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl shadow-md border-2 border-dashed border-orange-200">
+            <Lightbulb className="w-16 h-16 mx-auto text-orange-400 mb-4" />
+            <h3 className="text-xl font-semibold text-gray-600 dark:text-gray-300 mb-2">
               Nenhum desafio criado ainda
             </h3>
-            <p className="text-gray-500">Comece criando seu primeiro desafio!</p>
+            <p className="text-gray-500 dark:text-gray-300">Comece criando seu primeiro desafio!</p>
           </div>
         ) : (
           <>
