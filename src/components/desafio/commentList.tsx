@@ -1,5 +1,5 @@
 import Comment from './comment';
-import { CommentType } from '@/types/comment';
+import { CommentType } from '@/';
 
 type Props = {
     comments: CommentType[];

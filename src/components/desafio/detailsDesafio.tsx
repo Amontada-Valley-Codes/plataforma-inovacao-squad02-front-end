@@ -56,7 +56,7 @@ export default function DetalhesDesafio({ challenge, isOpen, onClose, isAdmin = 
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} className="bg-transparent">
+        <Modal isOpen={isOpen} onClose={onClose}>
             <div className={`bg-gradient-to-br ${currentTheme === 'dark' ? 'from-gray-800 to-gray-900' : 'from-white to-gray-50'} rounded-t-2xl`}>
                 {/* Header com gradiente e botões de admin */}
                 <div className={`bg-gradient-to-r ${currentTheme === 'dark' ? 'from-gray-700 to-gray-800' : 'from-orange-500 to-amber-600'} px-6 py-5 rounded-t-2xl flex justify-between items-center`}>
