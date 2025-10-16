@@ -38,6 +38,13 @@ export default function Card({
     const openDetalhes = () => setIsOpen(true);
     const closeDetalhes = () => setIsOpen(false);
 
+    const statusTraduzido: Record<string, string> = {
+    active: "Ativo",
+    inactive: "Inativo",
+    pending: "Pendente",
+    expired: "Expirado",
+    };
+
     return (
         <>
             <div className="px-4 py-6 max-w-[400px] rounded-2xl border-2 border-orange-200 bg-white dark:bg-gray-900 hover:shadow-lg transition-all duration-300 cursor-pointer">
@@ -45,7 +52,7 @@ export default function Card({
                     <p className="font-bold text-gray-800 dark:text-gray-100 truncate">{title}</p>
                     <div className="flex items-center gap-2">
                         <p className="px-3 py-1 text-xs text-white bg-gradient-to-r from-orange-500 to-amber-600 rounded-full font-semibold">
-                            {status}
+                            {statusTraduzido[status.toLowerCase()] || status}
                         </p>
                     </div>
                 </div>
@@ -67,7 +74,7 @@ export default function Card({
                     <p className={`px-3 py-1 rounded-full text-white text-sm font-semibold bg-gradient-to-r ${
                         visibility === "PUBLIC" 
                             ? "from-green-500 to-emerald-600" 
-                            : "from-orange-500 to-orange-600"
+                            : "from-gray-500 to-gray-600"
                     }`}>
                         {visibility === "PUBLIC" ? "Público" : "Privado"}
                     </p>

@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import api from "@/services/axiosServices";
 
 import Button from "../ui/button/Button";
+import Swal from "sweetalert2";
 
 const formSchema = z
     .object({
@@ -16,9 +17,10 @@ type FormData = z.infer<typeof formSchema>;
 
 type FormIdeaProps = {
     challengeId: string;
+    handleAddCommentClickIdea: () => void;
 };
 
-export default function FormIdea({ challengeId }: FormIdeaProps) {
+export default function FormIdea({ challengeId, handleAddCommentClickIdea }: FormIdeaProps) {
     const [formData, setFormData] = useState<FormData | null>(null);
     const {
         register,
@@ -38,9 +40,12 @@ export default function FormIdea({ challengeId }: FormIdeaProps) {
         try {
             const response = await api.post("/ideas", dataToSend);
             console.log("Ideia enviada com sucesso:", response.data);
+            setFormData(null);
+            Swal.fire("Sucesso!", "Ideia enviada com sucesso!", "success");
         } catch (error) {
             console.error("Erro ao enviar ideia:", error);
         }
+        handleAddCommentClickIdea();
     };
 
     return (

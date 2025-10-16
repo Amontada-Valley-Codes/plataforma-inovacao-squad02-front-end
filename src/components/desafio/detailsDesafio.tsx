@@ -7,7 +7,7 @@ import { IdeiaType } from "@/types/ideia";
 import { ThemeContext } from "@/context/ThemeContext";
 import { ChallengeType } from "@/types/challenge";
 import Button from "@/components/ui/button/Button";
-import desafios from "../landingpage/desafios";
+import { ca } from "zod/v4/locales";
 
 type Props = {
     challenge: ChallengeType;
@@ -25,6 +25,23 @@ export default function DetalhesDesafio({ challenge, isOpen, onClose, isAdmin = 
     }
     const { theme: currentTheme } = themeContext;
     const [ideias, setIdeias] = useState<IdeiaType[]>([]);
+
+    const statusTraduzido: Record<string, string> = {
+        active: "Ativo",
+        inactive: "Inativo",
+        pending: "Pendente",
+        expired: "Expirado",
+        completed: "Concluído",
+        canceled: "Cancelado",
+    };
+
+    const funnelStageTraduzido: Record<string, string> = {
+        idea_generation: "Geração de Ideias",
+        pre_screening: "Pré-Triagem",
+        ideation: "Ideação",
+        detailed_screening: "Triagem Detalhada",
+        experimentation: "Experimentação",
+    };
 
     useEffect(() => {
         if (isOpen && challenge.id) {
@@ -92,7 +109,7 @@ export default function DetalhesDesafio({ challenge, isOpen, onClose, isAdmin = 
                             <span className={`font-semibold ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Status:</span>
                         </div>
                         <span className={`${getStatusColor(challenge.status)} px-4 py-2 rounded-lg text-white text-sm font-semibold shadow-sm`}>
-                            {challenge.status}
+                            {statusTraduzido[challenge.status.toLowerCase()] || challenge.status}
                         </span>
                     </div>
 
@@ -120,6 +137,14 @@ export default function DetalhesDesafio({ challenge, isOpen, onClose, isAdmin = 
                         </div>
                     </div>
 
+                    <div className={`flex items-center gap-3 p-4 rounded-xl border-2 ${currentTheme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gradient-to-r from-orange-50 to-amber-50 border-orange-100'}`}>
+                        <Funnel className={`w-5 h-5 flex-shrink-0 ${currentTheme === 'dark' ? 'text-gray-400' : 'text-orange-600'}`} />
+                        <div>
+                            <span className={`font-semibold block text-sm mb-1 ${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Estágio no funil de inovação:</span>
+                            <span className={`${currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'} font-medium`}>{funnelStageTraduzido[challenge.funnelStage.toLowerCase()] || challenge.funnelStage}</span>
+                        </div>
+                    </div>
+
                     {/* Visibilidade */}
                     <div className="flex items-center gap-3">
                         <div className={`flex items-center gap-2 ${currentTheme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-orange-50 border-orange-100'} px-3 py-2 rounded-lg border`}>
@@ -141,8 +166,8 @@ export default function DetalhesDesafio({ challenge, isOpen, onClose, isAdmin = 
             </div>
 
             {/* Seção de Ideias */}
-            <div className={`border-t-2 $} ${challenge.funnelStage == "IDEATION"? 'block':'hidden'} ${currentTheme === 'dark' ? 'border-gray-600 bg-gray-800' : 'border-orange-100 bg-gradient-to-br from-orange-50 to-amber-50'}`}>
-                <Ideias ideias={ideias} challengeId={challenge.id} />
+            <div className={`border-t-2 ${challenge.funnelStage == "IDEATION" || "DETAILED_SCREENING" ? 'block' : 'hidden'} ${currentTheme === 'dark' ? 'border-gray-600 bg-gray-800' : 'border-orange-100 bg-gradient-to-br from-orange-50 to-amber-50'}`}>
+                <Ideias ideias={ideias} challengeId={challenge.id} funnelStage={challenge.funnelStage} />
             </div>
         </Modal>
     );

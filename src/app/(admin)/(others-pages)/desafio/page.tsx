@@ -52,6 +52,7 @@ type Desafio = {
   endDate: string;
   theme: string;
   description: string;
+  funnelStage: string;
   visibility: "PUBLIC" | "INTERNAL";
 };
 
@@ -303,7 +304,7 @@ export default function Page() {
                   }
                   theme={desafio.theme}
                   visibility={desafio.visibility}
-                  funnelStage="jh"
+                  funnelStage={desafio.funnelStage}
                   isAdmin={roleState === 'MANAGER'}
                   onEdit={() => openEditModal(desafio)}
                   onDelete={() => onDelete(desafio.id)}
