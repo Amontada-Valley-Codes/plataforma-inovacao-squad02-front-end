@@ -49,9 +49,9 @@ const AppSidebar: React.FC = () => {
   
   const filteredNavItems = allNavItems.filter((item) => {
     if (userRole === "ADMIN") 
-      return [ "Desafio", "Perfil","Dashboard","Startups","Funil de inovações","Usuários"].includes(item.name);
+      return [ "Desafio", "Perfil","Dashboard","Startups","Funil de inovações","Usuários","Empresa"].includes(item.name);
     if (userRole === "MANAGER")
-      return ["Usuários","Desafio","Perfil","Dashboard"].includes(item.name);
+      return ["Usuários","Desafio","Perfil","Dashboard","Funil de inovações"].includes(item.name);
     if (userRole === "EVALUATOR")
       return ["Dashboard", "Desafio", "Startups", "Perfil"].includes(item.name);
     if (userRole === "COMMON")
@@ -230,7 +230,7 @@ const AppSidebar: React.FC = () => {
           !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
         }`}
       >
-        <Link href="/">
+        <Link href="#">
           {isExpanded || isHovered || isMobileOpen ? (
             <>
               <Image

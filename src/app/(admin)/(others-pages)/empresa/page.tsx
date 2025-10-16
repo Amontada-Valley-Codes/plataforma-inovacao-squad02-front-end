@@ -105,7 +105,7 @@ export default function  Page(){
                     createdAt={empresa.createdAt}
                     />
                 ))}
-                </div>
+            </div>
 
 
             
