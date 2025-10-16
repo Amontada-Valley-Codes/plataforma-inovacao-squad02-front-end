@@ -11,9 +11,10 @@ import CommentForm from "./CommentForm";
 
 type Props = {
     Ideia: IdeiaType;
+    funnelStage: string;
 }
 
-export default function Ideia({ Ideia }: Props) {
+export default function Ideia({ Ideia, funnelStage }: Props) {
     const [isLikedState, setIsLikedState] = useState(false);
     const [showComments, setShowComments] = useState(false);
     const [countLike, setCountLike] = useState(0);
@@ -100,7 +101,7 @@ export default function Ideia({ Ideia }: Props) {
                         </span>
                     </button>
                     <button
-                        className="flex items-center gap-1 text-gray-500 dark:text-gray-300 hover:text-orange-600 transition-colors"
+                        className={` ${funnelStage == 'IDEATION'|| funnelStage == 'DETAILED_SCREENING' ? 'flex items-center gap-1 text-gray-500 dark:text-gray-300 hover:text-orange-600 transition-colors' : 'hidden'}`}
                         onClick={handleAddCommentClick}
                     >
                         <PlusCircle size={18} />
@@ -126,7 +127,7 @@ export default function Ideia({ Ideia }: Props) {
             )}
             {showForm && (
                 <div className="mt-4 bg-orange-50 dark:bg-gray-900 rounded p-3">
-                    <CommentForm ideaId={Ideia.id} />
+                    <CommentForm ideaId={Ideia.id} handleAddCommentClickComment={handleAddCommentClick} />
                 </div>
             )}
         </div>

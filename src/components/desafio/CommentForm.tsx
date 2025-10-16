@@ -14,9 +14,10 @@ type CommentFormData = z.infer<typeof commentSchema>;
 
 type CommentFormProps = {
     ideaId: string;
+    handleAddCommentClickComment?: () => void;
 };
 
-export default function CommentForm({ ideaId }: CommentFormProps) {
+export default function CommentForm({ ideaId, handleAddCommentClickComment }: CommentFormProps) {
     const {
         register,
         handleSubmit,
@@ -35,6 +36,9 @@ export default function CommentForm({ ideaId }: CommentFormProps) {
             console.log("Comentário enviado com sucesso:", response.data);
         } catch (error) {
             console.error("Erro ao enviar comentário:", error);
+        }
+        finally {
+            handleAddCommentClickComment();
         }
     };
 
