@@ -4,9 +4,11 @@ import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
 import Button from "@/components/ui/button/Button";
 import { Modal } from "@/components/ui/modal";
+import UserCard from "@/components/user/Usercard";
 import { useModal } from "@/hooks/useModal";
 import api from "@/services/axiosServices";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod"
@@ -20,10 +22,20 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>
 
 
+type Usuario = {
+    id:string,
+    name:string,
+    email:string,
+    type:string,
+    phone?:string,
+    photo?:string
+}
+
 
 export default function Page(){
 
     const { isOpen, openModal, closeModal } = useModal();
+    const [usuarios, setUsuarios] = useState<Usuario[]>([])
 
     const {
         register,
@@ -50,6 +62,23 @@ export default function Page(){
         closeModal()
 
     };
+
+    useEffect(() => {
+        const fetchEmpresas = async () => {
+          try {
+            const res = await api.get("/users/company");
+            setUsuarios(res.data); 
+            console.log("usuarios da empresa:", res.data);
+          } catch (erro) {
+            console.error("Erro ao Cadastra uma empresa", erro);
+          }
+          
+        };
+    
+        fetchEmpresas();
+      }, []);
+
+    
     
     return(
         <div>
@@ -62,6 +91,22 @@ export default function Page(){
                 </Button>
                 
             </div>
+
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {usuarios.map((usuario) => (
+                <UserCard
+                    key={usuario.id}
+                    id={usuario.id}
+                    name={usuario.name}
+                    email={usuario.email}
+                    type={usuario.type}
+                    phone={usuario.phone}
+                    photo={usuario.photo}
+                
+                    // createdAt={usuario.createdAt}
+                />
+            ))}
+</div>
 
 
 
