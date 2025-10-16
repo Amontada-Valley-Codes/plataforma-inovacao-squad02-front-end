@@ -282,7 +282,7 @@
 }
 
 .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: #344054;
+  background-color: #3c485c;
 }
 
 @layer utilities {
@@ -829,7 +829,7 @@ span.flatpickr-weekday,
 */
 
 .dark {
-  --background: oklch(0.145 0 0);
+  --background: oklch(38.582% 0.00406 16.738);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
@@ -869,7 +869,7 @@ span.flatpickr-weekday,
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1; /* cor de fundo */
+  background: var(--background);
   border-radius: 10px;
 }
 
