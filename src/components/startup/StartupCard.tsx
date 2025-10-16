@@ -330,14 +330,14 @@ function StartupDetalhes({ startup, isOpen, onClose, isAdmin, onEdit, onDelete }
                     </div>
                 </div>
 
-                {/* Footer */}
-                <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end">
+                    {/* Footer */}
+                <div className="lg:absolute lg:top-1 lg:right-43 px-6 py-4 dark:border-gray-700 flex justify-end">
                     <Button 
                         onClick={onClose}
                         variant="primary"
                         className="bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-semibold"
                     >
-                        Fechar
+                        ✖
                     </Button>
                 </div>
             </div>
