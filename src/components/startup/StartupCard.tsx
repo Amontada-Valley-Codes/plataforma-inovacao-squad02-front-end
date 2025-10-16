@@ -1,6 +1,9 @@
-import { CalendarClock, Building2, Users, Target, Link, AlertCircle } from "lucide-react"
+import { CalendarClock, Building2, Users, Target, Link, AlertCircle, MapPin, Code, Puzzle, Pencil, Trash2 } from "lucide-react";
+import Button from "@/components/ui/button/Button";
+import React, { useState } from "react";
 
 type StartupCardProps = {
+    id: string;
     name: string;
     cnpj: string;
     segment: string[];
@@ -12,11 +15,13 @@ type StartupCardProps = {
     pitch: string;
     links: string[];
     createdAt: string;
-    isExpanded?: boolean;
-    onToggleExpand?: () => void;
+    isAdmin?: boolean;
+    onEdit?: () => void;
+    onDelete?: () => void;
 }
 
 export default function StartupCard({ 
+    id,
     name, 
     cnpj, 
     segment, 
@@ -28,187 +33,314 @@ export default function StartupCard({
     pitch, 
     links, 
     createdAt,
-    isExpanded = false,
-    onToggleExpand 
+    isAdmin = false,
+    onEdit,
+    onDelete 
 }: StartupCardProps) {
-  
+    const [isOpen, setIsOpen] = useState(false);
+
+    const openDetalhes = () => setIsOpen(true);
+    const closeDetalhes = () => setIsOpen(false);
+
+    // Formatar data
+    const formatDate = (dateString: string) => {
+        try {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('pt-BR');
+        } catch {
+            return "Data inválida";
+        }
+    };
+
+    // Cor do estágio baseado no status
+    const getStageColor = (stage: string) => {
+        const stageLower = stage.toLowerCase();
+        if (stageLower.includes('seed') || stageLower.includes('inicial') || stageLower.includes('early')) {
+            return "from-green-500 to-emerald-600";
+        } else if (stageLower.includes('growth') || stageLower.includes('crescimento')) {
+            return "from-blue-500 to-blue-600";
+        } else if (stageLower.includes('scale') || stageLower.includes('escala')) {
+            return "from-purple-500 to-purple-600";
+        } else {
+            return "from-orange-500 to-amber-600";
+        }
+    };
+
     return (
-        <div className="group bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 max-w-[400px] w-full overflow-hidden">
-           
-            {/* Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
-                <div className="flex items-center justify-between">
+        <>
+            <div className="px-4 py-6 max-w-[400px] rounded-2xl border-2 border-orange-200 bg-white dark:bg-gray-900 hover:shadow-lg transition-all duration-300 cursor-pointer">
+                {/* Header */}
+                <div className="flex justify-between items-center">
                     <div className="flex items-center gap-3">
-                        <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
-                            <Building2 size={20} className="text-white" />
+                        <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
+                            <Building2 size={20} className="text-orange-600 dark:text-orange-400" />
                         </div>
-                        <div>
-                            <h3 className="font-bold text-white text-lg truncate max-w-[200px]">{name}</h3>
-                            <p className="text-blue-100 text-sm">Startup</p>
-                        </div>
+                        <p className="font-bold text-gray-800 dark:text-gray-100 truncate max-w-[180px]">{name}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <p className={`px-3 py-1 text-xs text-white bg-gradient-to-r rounded-full font-semibold ${getStageColor(stage)}`}>
+                            {stage}
+                        </p>
                     </div>
                 </div>
-            </div>
-
-            {/* Content */}
-            <div className="px-6 py-5">
                 
                 {/* Pitch/Descrição */}
-                <div className="mb-6">
-                    <div className="flex items-center gap-2 mb-3">
-                        <span className="text-sm font-medium text-gray-500">Pitch</span>
-                    </div>
-                    <p className="text-gray-700 leading-relaxed line-clamp-3">{pitch}</p>
+                <div className="mt-5">
+                    <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed line-clamp-2">
+                        {pitch}
+                    </p>
                 </div>
 
                 {/* Informações principais */}
-                <div className="space-y-4">
-                    {/* Data de criação */}
-                    <div className="flex items-center gap-3 p-3 rounded-lg">
-                        <div className="p-2 bg-blue-50 rounded-lg">
-                            <CalendarClock size={18} className="text-blue-600" />
-                        </div>
-                        <div>
-                            <p className="text-sm text-gray-500">Criado em</p>
-                            <p className="text-gray-900 font-medium">{createdAt}</p>
-                        </div>
-                    </div>
-
+                <div className="mt-4 space-y-3">
                     {/* Localização */}
-                    <div className="flex items-center gap-3 p-3 rounded-lg">
-                        <div className="p-2 bg-blue-50 rounded-lg">
-                            <Target size={18} className="text-blue-600" />
-                        </div>
-                        <div>
-                            <p className="text-sm text-gray-500">Localização</p>
-                            <p className="text-gray-900 font-medium">{location}</p>
-                        </div>
+                    <div className="flex gap-2 items-center text-gray-700 dark:text-gray-300 bg-orange-50 dark:bg-gray-800 px-3 py-2 rounded-lg border border-orange-100 dark:border-gray-700">
+                        <MapPin size={18} className="text-orange-600" />
+                        <p className="text-sm font-medium">{location}</p>
                     </div>
 
-                    {/* Estágio */}
-                    <div className="flex items-center gap-3 p-3 rounded-lg">
-                        <div className="p-2 bg-blue-50 rounded-lg">
-                            <AlertCircle size={18} className="text-blue-600" />
-                        </div>
-                        <div>
-                            <p className="text-sm text-gray-500">Estágio</p>
-                            <p className="text-gray-900 font-medium">{stage}</p>
-                        </div>
+                    {/* Data de criação */}
+                    <div className="flex gap-2 items-center text-gray-700 dark:text-gray-300 bg-orange-50 dark:bg-gray-800 px-3 py-2 rounded-lg border border-orange-100 dark:border-gray-700">
+                        <CalendarClock size={18} className="text-orange-600" />
+                        <p className="text-sm font-medium">Criado em {formatDate(createdAt)}</p>
                     </div>
 
-                    {/* Informações compactadas */}
-                    {!isExpanded && (
-                        <>
-                            {/* CNPJ e Status */}
-                            <div className="flex justify-between items-center p-3 rounded-lg">
-                                <div>
-                                    <p className="text-sm text-gray-600">CNPJ</p>
-                                    <p className="text-gray-900 font-mono font-semibold text-sm">
-                                        {cnpj}
-                                    </p>
+                    {/* Segmento principal */}
+                    <div className="flex gap-2 items-center text-gray-700 dark:text-gray-300 bg-orange-50 dark:bg-gray-800 px-3 py-2 rounded-lg border border-orange-100 dark:border-gray-700">
+                        <Puzzle size={18} className="text-orange-600" />
+                        <p className="text-sm font-medium">{segment[0] || "Startup"}</p>
+                    </div>
+                </div>
+
+                {/* Footer */}
+                <div className="flex justify-between items-center mt-4">
+                    <p className="px-3 py-1 rounded-full text-white text-sm font-semibold bg-gradient-to-r from-blue-500 to-blue-600">
+                        {technologies.length} techs
+                    </p>
+                    <Button 
+                        onClick={openDetalhes} 
+                        size="sm" 
+                        variant="primary"
+                        className="bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-semibold"
+                    >
+                        Ver Detalhes
+                    </Button>
+                </div>
+            </div>
+            
+            {/* Modal de Detalhes - Similar ao DetalhesDesafio */}
+            <StartupDetalhes
+                startup={{ 
+                    id, name, cnpj, segment, technologies, stage, 
+                    problems, location, founders, pitch, links, createdAt 
+                }}
+                isOpen={isOpen}
+                onClose={closeDetalhes}
+                isAdmin={isAdmin}
+                onEdit={onEdit}
+                onDelete={onDelete}
+            />
+        </>
+    );
+}
+
+// Componente Modal de Detalhes (similar ao DetalhesDesafio)
+interface StartupDetalhesProps {
+    startup: StartupCardProps;
+    isOpen: boolean;
+    onClose: () => void;
+    isAdmin?: boolean;
+    onEdit?: () => void;
+    onDelete?: () => void;
+}
+
+function StartupDetalhes({ startup, isOpen, onClose, isAdmin, onEdit, onDelete }: StartupDetalhesProps) {
+    if (!isOpen) return null;
+
+    const formatDate = (dateString: string) => {
+        try {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('pt-BR');
+        } catch {
+            return "Data inválida";
+        }
+    };
+
+    const getStageColor = (stage: string) => {
+        const stageLower = stage.toLowerCase();
+        if (stageLower.includes('seed') || stageLower.includes('inicial') || stageLower.includes('early')) {
+            return "bg-gradient-to-r from-green-500 to-emerald-600";
+        } else if (stageLower.includes('growth') || stageLower.includes('crescimento')) {
+            return "bg-gradient-to-r from-blue-500 to-blue-600";
+        } else if (stageLower.includes('scale') || stageLower.includes('escala')) {
+            return "bg-gradient-to-r from-purple-500 to-purple-600";
+        } else {
+            return "bg-gradient-to-r from-orange-500 to-amber-600";
+        }
+    };
+
+    return (
+        <div className="fixed inset-0 bg-black/50 dark:bg-gray-800/20 z-[2000] backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden border-2 border-orange-200">
+                {/* Header */}
+                <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-3">
+                            <Building2 className="w-6 h-6 text-orange-600" />
+                            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">{startup.name}</h2>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className={`px-3 py-1 text-white text-sm font-semibold rounded-full ${getStageColor(startup.stage)}`}>
+                                {startup.stage}
+                            </span>
+                            {isAdmin && (
+                                <div className="flex gap-2">
+                                    {/* Usando variant outline ou sem variant para botões secundários */}
+                                    <Button 
+                                        size="sm" 
+                                        variant="outline" 
+                                        onClick={onEdit}
+                                        className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                                    >
+                                        <Pencil size={16} />
+                                    </Button>
+                                    <Button 
+                                        size="sm" 
+                                        variant="outline" 
+                                        onClick={onDelete}
+                                        className="border-red-300 text-red-700 hover:bg-red-50"
+                                    >
+                                        <Trash2 size={16} />
+                                    </Button>
                                 </div>
-                                <div className="px-3 py-1 bg-green-500 text-white rounded-full text-sm font-medium">
-                                    {stage}
+                            )}
+                        </div>
+                    </div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">CNPJ: {startup.cnpj}</p>
+                </div>
+
+                {/* Content */}
+                <div className="p-6 overflow-y-auto max-h-[70vh]">
+                    <div className="space-y-6">
+                        {/* Pitch */}
+                        <div>
+                            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3">Pitch</h3>
+                            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{startup.pitch}</p>
+                        </div>
+
+                        {/* Problema */}
+                        <div>
+                            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3">Problema que Resolve</h3>
+                            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{startup.problems}</p>
+                        </div>
+
+                        {/* Informações Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Localização */}
+                            <div className="flex items-center gap-3 p-3 bg-orange-50 dark:bg-gray-800 rounded-lg">
+                                <MapPin className="w-5 h-5 text-orange-600" />
+                                <div>
+                                    <p className="text-sm text-gray-500">Localização</p>
+                                    <p className="text-gray-800 dark:text-gray-200 font-medium">{startup.location}</p>
                                 </div>
                             </div>
 
-                            {/* Botão Ver Mais */}
-                            <button 
-                                onClick={onToggleExpand}
-                                className="w-full py-2 text-blue-600 hover:bg-blue-50 rounded-lg font-medium transition-colors"
-                            >
-                                Ver mais detalhes
-                            </button>
-                        </>
-                    )}
+                            {/* Data de Criação */}
+                            <div className="flex items-center gap-3 p-3 bg-orange-50 dark:bg-gray-800 rounded-lg">
+                                <CalendarClock className="w-5 h-5 text-orange-600" />
+                                <div>
+                                    <p className="text-sm text-gray-500">Criado em</p>
+                                    <p className="text-gray-800 dark:text-gray-200 font-medium">{formatDate(startup.createdAt)}</p>
+                                </div>
+                            </div>
 
-                    {/* Informações expandidas */}
-                    {isExpanded && (
-                        <div className="space-y-4 border-t pt-4">
-                            {/* Segmentos */}
-                            <div>
-                                <p className="text-sm text-gray-500 mb-2">Segmentos</p>
-                                <div className="flex flex-wrap gap-2">
-                                    {segment.map((seg, index) => (
-                                        <span 
-                                            key={index}
-                                            className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium"
-                                        >
-                                            {seg}
-                                        </span>
-                                    ))}
+                            {/* Fundadores */}
+                            <div className="flex items-center gap-3 p-3 bg-orange-50 dark:bg-gray-800 rounded-lg">
+                                <Users className="w-5 h-5 text-orange-600" />
+                                <div>
+                                    <p className="text-sm text-gray-500">Fundadores</p>
+                                    <p className="text-gray-800 dark:text-gray-200 font-medium">
+                                        {startup.founders.join(', ')}
+                                    </p>
                                 </div>
                             </div>
 
                             {/* Tecnologias */}
+                            <div className="flex items-center gap-3 p-3 bg-orange-50 dark:bg-gray-800 rounded-lg">
+                                <Code className="w-5 h-5 text-orange-600" />
+                                <div>
+                                    <p className="text-sm text-gray-500">Tecnologias</p>
+                                    <p className="text-gray-800 dark:text-gray-200 font-medium">
+                                        {startup.technologies.length} tecnologias
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Segmentos */}
+                        <div>
+                            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3">Segmentos</h3>
+                            <div className="flex flex-wrap gap-2">
+                                {startup.segment.map((seg, index) => (
+                                    <span 
+                                        key={index}
+                                        className="px-3 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 rounded-full text-sm font-medium"
+                                    >
+                                        {seg}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Tecnologias */}
+                        <div>
+                            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3">Tecnologias</h3>
+                            <div className="flex flex-wrap gap-2">
+                                {startup.technologies.map((tech, index) => (
+                                    <span 
+                                        key={index}
+                                        className="px-3 py-1 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 rounded-full text-sm font-medium"
+                                    >
+                                        {tech}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Links */}
+                        {startup.links.length > 0 && (
                             <div>
-                                <p className="text-sm text-gray-500 mb-2">Tecnologias</p>
-                                <div className="flex flex-wrap gap-2">
-                                    {technologies.map((tech, index) => (
-                                        <span 
+                                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3">Links</h3>
+                                <div className="space-y-2">
+                                    {startup.links.map((link, index) => (
+                                        <a 
                                             key={index}
-                                            className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium"
+                                            href={link} 
+                                            target="_blank" 
+                                            rel="noopener noreferrer"
+                                            className="flex items-center gap-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium break-all"
                                         >
-                                            {tech}
-                                        </span>
+                                            <Link className="w-4 h-4" />
+                                            {link}
+                                        </a>
                                     ))}
                                 </div>
                             </div>
+                        )}
+                    </div>
+                </div>
 
-                            {/* Problema */}
-                            <div>
-                                <p className="text-sm text-gray-500 mb-2">Problema que resolve</p>
-                                <p className="text-gray-700 text-sm">{problems}</p>
-                            </div>
-
-                            {/* Fundadores */}
-                            <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50">
-                                <div className="p-2 bg-blue-50 rounded-lg">
-                                    <Users size={18} className="text-blue-600" />
-                                </div>
-                                <div>
-                                    <p className="text-sm text-gray-500">Fundadores</p>
-                                    <div className="flex flex-wrap gap-1 mt-1">
-                                        {founders.map((founder, index) => (
-                                            <span key={index} className="text-gray-900 font-medium text-sm">
-                                                {founder}{index < founders.length - 1 ? ', ' : ''}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Links */}
-                            {links.length > 0 && links[0] && (
-                                <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50">
-                                    <div className="p-2 bg-blue-50 rounded-lg">
-                                        <Link size={18} className="text-blue-600" />
-                                    </div>
-                                    <div>
-                                        <p className="text-sm text-gray-500">Links</p>
-                                        <a 
-                                            href={links[0]} 
-                                            target="_blank" 
-                                            rel="noopener noreferrer"
-                                            className="text-blue-600 hover:text-blue-800 text-sm font-medium break-all"
-                                        >
-                                            {links[0]}
-                                        </a>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Botão Ver Menos */}
-                            <button 
-                                onClick={onToggleExpand}
-                                className="w-full py-2 text-blue-600 hover:bg-blue-50 rounded-lg font-medium transition-colors"
-                            >
-                                Ver menos
-                            </button>
-                        </div>
-                    )}
+                {/* Footer */}
+                <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end">
+                    <Button 
+                        onClick={onClose}
+                        variant="primary"
+                        className="bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-semibold"
+                    >
+                        Fechar
+                    </Button>
                 </div>
             </div>
         </div>
-    )
+    );
 }
