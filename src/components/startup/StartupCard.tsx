@@ -1,4 +1,4 @@
-import { CalendarClock, Building2, Users, Target, Link, AlertCircle, MapPin, Code, Puzzle, Pencil, Trash2 } from "lucide-react";
+import { CalendarClock, Building2, Users,  Link,  MapPin, Code, Puzzle, Pencil, Trash2 } from "lucide-react";
 import Button from "@/components/ui/button/Button";
 import React, { useState } from "react";
 

@@ -24,14 +24,14 @@ import {
 const formSchema = z.object({
   name: z.string().min(3, "Digite o nome da Startup"),
   cnpj: z.string().min(18, "CNPJ inválido"),
-  segment: z.array(z.enum(["HEALTH","EDUCATION","AGRITECH","INDUSTRY","ENERGY","MARKETING","TRANSPORT","ENVIRONMENT","CYBERSECURITY","IA",])).min(1, "Selecione pelo menos um Seguimento"),
-  technologies: z.array(z.enum(["AI", "MOBILE", "WEB", "BLOCKCHAIN", "IOT"])).min(1, "Selecione pelo menos uma tecnologia"),
+  segment: z.array(z.enum(["HEALTH","EDUCATION","AGRITECH","INDUSTRY","ENERGY","MARKETING", "TRANSPORT","ENVIRONMENT","CYBERSECURITY","AI",])).min(1, "Selecione pelo menos um Seguimento"),
+  technologies: z.array(z.enum(["AI", "MOBILE", "WEB3", "BLOCKCHAIN", "IOT"])).min(1, "Selecione pelo menos uma tecnologia"),
   stage: z.enum(["IDEATION", "OPERATION", "TRACTION", "SCALE"]),
   problems: z.string().min(5, "Descreva melhor o problema"),
   location: z.string().min(2, "Digite uma localização válida"),
   founders: z.array(z.string().min(1, "Nome do fundador é obrigatório")),
   pitch: z.string().min(5, "Descreva melhor o pitch"),
-  links: z.array(z.string().min(1, "Link é obrigatório"))
+  links: z.array(z.string().min(1, "Link é obrigatório")),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -51,10 +51,10 @@ type Startup = FormData & {
 const TECHNOLOGIES = [
   { value: "AI", label: "Inteligência Artificial" },
   { value: "MOBILE", label: "Aplicativos Mobile" },
-  { value: "WEB", label: "Desenvolvimento Web" },
+  { value: "WEB3", label: "Desenvolvimento Web" },
   { value: "BLOCKCHAIN", label: "Blockchain" },
   { value: "IOT", label: "Internet das Coisas" },
-] 
+];
 
 const SEGMENTS = [
   { value: "HEALTH", label: "Saúde" },
@@ -66,8 +66,8 @@ const SEGMENTS = [
   { value: "TRANSPORT", label: "Transporte" },
   { value: "ENVIRONMENT", label: "Meio Ambiente" },
   { value: "CYBERSECURITY", label: "Cibersegurança" },
-  { value: "IA", label: "Inteligência Artificial" },
-] 
+  { value: "AI", label: "Inteligência Artificial" },
+];
 
 export default function Page() {
   const { isOpen, openModal, closeModal } = useModal();
@@ -117,7 +117,7 @@ export default function Page() {
       const res = await api.get<StartupResponse>("/startup", {
         params: {
           page: currentPage,
-          limit: 9
+          limit: 9,
         },
       });
       setStartups(res.data.data);
@@ -137,7 +137,7 @@ export default function Page() {
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     setError(null);
-    console.log(data)
+    console.log(data);
     try {
       await api.post("/startup", data);
       closeModal();
