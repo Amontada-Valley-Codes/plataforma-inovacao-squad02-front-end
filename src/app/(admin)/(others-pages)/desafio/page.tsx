@@ -7,14 +7,12 @@ import { useModal } from "@/hooks/useModal";
 import React, { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { getUserRole } from "@/utils/getUserRole";
-
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import Button from "@/components/ui/button/Button";
 import DatePicker from "@/components/form/date-picker";
 import TextArea from "@/components/form/input/TextArea";
-import { Lightbulb, Pencil, Trash2 } from "lucide-react";
+import { Lightbulb } from "lucide-react";
 import Card from "@/components/desafio/card";
 import api from "@/services/axiosServices";
 import {
@@ -26,7 +24,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination"
 import Swal from "sweetalert2";
-import { fi } from "zod/v4/locales";
+
 
 const formSchema = z
   .object({

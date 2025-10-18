@@ -95,12 +95,12 @@ export default function SignInForm() {
               )}
                 <div>
                   <Label>
-                    Password <span className="text-error-500">*</span>{" "}
+                    Senha <span className="text-error-500">*</span>{" "}
                   </Label>
                   <div className="relative">
                     <Input
                       type={showPassword ? "text" : "password"}
-                      placeholder="Enter your password"
+                      placeholder="Digite sua senha"
                       {...register("password")}
                       
                     />

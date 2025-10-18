@@ -3,14 +3,14 @@
 import ComponentCard from "@/components/common/ComponentCard";
 import { Modal } from "@/components/ui/modal";
 import { useModal } from "@/hooks/useModal";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "@/components/ui/button/Button";
 import Label from "@/components/form/Label";
 import Input from "@/components/form/input/InputField";
 import api from "@/services/axiosServices";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import StartupCard from "@/components/startup/StartupCard";
 import {
   Pagination,
@@ -21,143 +21,167 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
-const SEGMENTS = ["EDUCATION", "HEALTH", "AI", "FINTECH", "MOBILE"] as const;
-const TECHNOLOGIES = ["AI", "MOBILE", "WEB", "IOT", "BLOCKCHAIN"] as const;
-const STAGES = ["IDEATION", "MVP", "GROWTH", "SCALE"] as const;
-
 const formSchema = z.object({
   name: z.string().min(3, "Digite o nome da Startup"),
-  cnpj: z.string().min(14, "CNPJ inválido").max(18, "CNPJ inválido"),
-  segment: z.array(z.enum(SEGMENTS)).nonempty("Escolha pelo menos um segmento"),
-  technologies: z.array(z.enum(TECHNOLOGIES)).nonempty("Escolha pelo menos uma tecnologia"),
-  stage: z.enum(STAGES),
+  cnpj: z.string().min(18, "CNPJ inválido"),
+  segment: z.array(z.enum(["HEALTH","EDUCATION","AGRITECH","INDUSTRY","ENERGY","MARKETING","TRANSPORT","ENVIRONMENT","CYBERSECURITY","IA",])).min(1, "Selecione pelo menos um Seguimento"),
+  technologies: z.array(z.enum(["AI", "MOBILE", "WEB", "BLOCKCHAIN", "IOT"])).min(1, "Selecione pelo menos uma tecnologia"),
+  stage: z.enum(["IDEATION", "OPERATION", "TRACTION", "SCALE"]),
   problems: z.string().min(5, "Descreva melhor o problema"),
   location: z.string().min(2, "Digite uma localização válida"),
-  founders: z.array(z.string().min(1, "Informe pelo menos um fundador")),
+  founders: z.array(z.string().min(1, "Nome do fundador é obrigatório")),
   pitch: z.string().min(5, "Descreva melhor o pitch"),
-  links: z.array(z.string().url("Link inválido").min(5, "Informe pelo menos um link válido")),
+  links: z.array(z.string().min(1, "Link é obrigatório"))
 });
 
 type FormData = z.infer<typeof formSchema>;
 
 type StartupResponse = {
-  data: FormData[];
+  data: Startup[];
   total: number;
   page: number;
   limit: number;
 };
 
+type Startup = FormData & {
+  id: string;
+  createdAt: string;
+};
+
+const TECHNOLOGIES = [
+  { value: "AI", label: "Inteligência Artificial" },
+  { value: "MOBILE", label: "Aplicativos Mobile" },
+  { value: "WEB", label: "Desenvolvimento Web" },
+  { value: "BLOCKCHAIN", label: "Blockchain" },
+  { value: "IOT", label: "Internet das Coisas" },
+] 
+
+const SEGMENTS = [
+  { value: "HEALTH", label: "Saúde" },
+  { value: "EDUCATION", label: "Educação" },
+  { value: "AGRITECH", label: "Agrotecnologia" },
+  { value: "INDUSTRY", label: "Indústria" },
+  { value: "ENERGY", label: "Energia" },
+  { value: "MARKETING", label: "Marketing" },
+  { value: "TRANSPORT", label: "Transporte" },
+  { value: "ENVIRONMENT", label: "Meio Ambiente" },
+  { value: "CYBERSECURITY", label: "Cibersegurança" },
+  { value: "IA", label: "Inteligência Artificial" },
+] 
+
 export default function Page() {
   const { isOpen, openModal, closeModal } = useModal();
-  const [startups, setStartups] = useState<FormData[]>([]);
-  const [expandedStartup, setExpandedStartup] = useState<number | null>(null);
+  const [startups, setStartups] = useState<Startup[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     register,
     handleSubmit,
-    watch,
-    setValue,
     reset,
+    control,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      segment: [],
-      technologies: [],
       founders: [""],
       links: [""],
     },
   });
 
-  const selectedSegments = watch("segment", []);
-  const selectedTechnologies = watch("technologies", []);
+  const {
+    fields: linkFields,
+    append: appendLink,
+    remove: removeLink,
+  } = useFieldArray<any>({
+    control,
+    name: "links",
+  });
 
-  type SegmentValue = typeof SEGMENTS[number];
-  type TechnologyValue = typeof TECHNOLOGIES[number];
+  const {
+    fields: founderFields,
+    append: appendFounder,
+    remove: removeFounder,
+  } = useFieldArray<any>({
+    control,
+    name: "founders",
+  });
 
-  const handleCheckboxChange = (
-    field: "segment" | "technologies",
-    value: SegmentValue | TechnologyValue
-  ) => {
-    const current = watch(field);
-    const updated = current.includes(value as any)
-      ? current.filter((v) => v !== value)
-      : [...current, value as any];
-    setValue(field, updated as any, { shouldValidate: true });
-  };
-
-  const handleToggleExpand = (index: number) => {
-    setExpandedStartup(expandedStartup === index ? null : index);
-  };
-
-  // Função para buscar startups do backend com paginação
-  const fetchStartups = async () => {
+  const fetchStartups = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const res = await api.get<StartupResponse>("/startup", {
         params: {
           page: currentPage,
-          limit: 9, // Mesmo limite dos desafios
+          limit: 9
         },
       });
       setStartups(res.data.data);
       setTotalPages(Math.ceil(res.data.total / res.data.limit));
-    } catch (error) {
-      console.error("Erro ao buscar startups:", error);
-      setError("Erro ao carregar startups.");
+    } catch (err) {
+      console.error("Erro ao buscar startups:", err);
+      setError("Erro ao carregar startups. Tente novamente.");
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage]);
 
   useEffect(() => {
     fetchStartups();
-  }, [currentPage]);
+  }, [fetchStartups]);
 
-  // Envio do formulário
   const onSubmit = async (data: FormData) => {
+    setIsSubmitting(true);
+    setError(null);
+    console.log(data)
     try {
-      const response = await api.post("/startup", data);
-      console.log("Startup cadastrada:", response.data);
+      await api.post("/startup", data);
       closeModal();
-      reset();
-      fetchStartups(); // Atualiza a lista automaticamente
-      // Volta para a primeira página para ver o novo item
+      reset({
+        founders: [""],
+        links: [""],
+      });
       setCurrentPage(1);
-    } catch (error) {
-      console.error("Erro ao cadastrar startup:", error);
-      setError("Erro ao cadastrar startup.");
+      await fetchStartups();
+    } catch (err) {
+      console.error("Erro ao cadastrar startup:", err);
+      setError("Erro ao cadastrar startup. Tente novamente.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
-      </div>
-    );
-  }
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <p className="text-2xl font-semibold">Cadastro da Startup</p>
+        <h1 className="text-2xl font-semibold">Cadastro da Startup</h1>
         <Button onClick={openModal} size="sm" variant="primary">
-          Nova Empresa
+          Criar Startup
         </Button>
       </div>
 
-      {/* Lista de startups com paginação */}
       <div className="px-6 pb-8">
-        {error ? (
-          <div className="mx-6 mt-6 bg-red-100 border border-red-400 text-red-500 px-4 py-3 rounded">
+        {error && (
+          <div className="mb-6 bg-red-100 border border-red-400 text-red-500 px-4 py-3 rounded">
             {error}
           </div>
-        ) : !loading && startups.length === 0 ? (
+        )}
+
+        {loading ? (
+          <div className="flex justify-center items-center py-16">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+          </div>
+        ) : startups.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-2xl shadow-md border-2 border-dashed border-orange-200">
             <div className="w-16 h-16 mx-auto bg-orange-100 rounded-full flex items-center justify-center mb-4">
               <span className="text-2xl">🏢</span>
@@ -165,14 +189,17 @@ export default function Page() {
             <h3 className="text-xl font-semibold text-gray-700 mb-2">
               Nenhuma startup cadastrada ainda
             </h3>
-            <p className="text-gray-500">Comece criando sua primeira startup!</p>
+            <p className="text-gray-500">
+              Comece criando sua primeira startup!
+            </p>
           </div>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {startups.map((startup, index) => (
+              {startups.map((startup) => (
                 <StartupCard
-                  key={index}
+                  key={startup.id}
+                  id={startup.id}
                   name={startup.name}
                   cnpj={startup.cnpj}
                   segment={startup.segment}
@@ -183,175 +210,284 @@ export default function Page() {
                   founders={startup.founders}
                   pitch={startup.pitch}
                   links={startup.links}
-                  createdAt={new Date().toLocaleDateString("pt-BR")}
-                  isExpanded={expandedStartup === index}
-                  onToggleExpand={() => handleToggleExpand(index)}
+                  createdAt={new Date(startup.createdAt).toLocaleDateString(
+                    "pt-BR"
+                  )}
                 />
               ))}
             </div>
 
-            {/* Paginação */}
-            <div className="mt-6 flex justify-center">
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious
-                      href="#"
-                      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                      aria-disabled={currentPage === 1}
-                    />
-                  </PaginationItem>
-                  {[...Array(totalPages)].map((_, idx) => (
-                    <PaginationItem key={idx}>
-                      <PaginationLink
+            {totalPages > 1 && (
+              <div className="mt-6 flex justify-center">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious
                         href="#"
-                        isActive={currentPage === idx + 1}
-                        onClick={() => setCurrentPage(idx + 1)}
-                      >
-                        {idx + 1}
-                      </PaginationLink>
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handlePageChange(currentPage - 1);
+                        }}
+                        aria-disabled={currentPage === 1}
+                      />
                     </PaginationItem>
-                  ))}
-                  <PaginationItem>
-                    <PaginationNext
-                      href="#"
-                      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                      aria-disabled={currentPage === totalPages}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </div>
+                    {[...Array(totalPages)].map((_, idx) => (
+                      <PaginationItem key={idx}>
+                        <PaginationLink
+                          href="#"
+                          isActive={currentPage === idx + 1}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handlePageChange(idx + 1);
+                          }}
+                        >
+                          {idx + 1}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    <PaginationItem>
+                      <PaginationNext
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handlePageChange(currentPage + 1);
+                        }}
+                        aria-disabled={currentPage === totalPages}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            )}
           </>
         )}
       </div>
 
-      {/* Modal de cadastro */}
       <Modal isOpen={isOpen} onClose={closeModal}>
         <ComponentCard title="Criar nova empresa">
           <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
-            {/* Nome */}
             <div>
-              <Label>Nome da Startup</Label>
-              <Input type="text" placeholder="Nome da Startup" {...register("name")} />
-              {errors.name && <span className="text-red-600 text-sm">{errors.name.message}</span>}
+              <Label htmlFor="name">Nome da Startup</Label>
+              <Input
+                id="name"
+                type="text"
+                placeholder="Nome da Startup"
+                {...register("name")}
+              />
+              {errors.name && (
+                <span className="text-red-600 text-sm">
+                  {errors.name.message}
+                </span>
+              )}
             </div>
 
-            {/* CNPJ */}
             <div>
-              <Label>CNPJ</Label>
-              <Input type="text" placeholder="XX.XXX.XXX/0001-XX" {...register("cnpj")} />
-              {errors.cnpj && <span className="text-red-600 text-sm">{errors.cnpj.message}</span>}
+              <Label htmlFor="cnpj">CNPJ</Label>
+              <Input
+                id="cnpj"
+                type="text"
+                placeholder="XX.XXX.XXX/0001-XX"
+                {...register("cnpj")}
+              />
+              {errors.cnpj && (
+                <span className="text-red-600 text-sm">
+                  {errors.cnpj.message}
+                </span>
+              )}
             </div>
 
-            {/* Segmentos */}
-            <div>
-              <Label>Segmentos</Label>
-              <div className="flex flex-wrap gap-3 mt-2">
-                {SEGMENTS.map((s) => (
-                  <label key={s} className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      value={s}
-                      checked={selectedSegments.includes(s)}
-                      onChange={() => handleCheckboxChange("segment", s)}
-                      className="cursor-pointer"
-                    />
-                    <span className="text-sm">{s}</span>
-                  </label>
-                ))}
-              </div>
-              {errors.segment && <p className="text-red-600 text-sm mt-1">{errors.segment.message}</p>}
-            </div>
-
-            {/* Tecnologias */}
             <div>
               <Label>Tecnologias</Label>
               <div className="flex flex-wrap gap-3 mt-2">
-                {TECHNOLOGIES.map((t) => (
-                  <label key={t} className="flex items-center gap-2 cursor-pointer">
+                {TECHNOLOGIES.map((tech) => (
+                  <label
+                    key={tech.value}
+                    className="flex items-center space-x-2 border rounded-md px-3 py-1 hover:bg-gray-50 cursor-pointer"
+                  >
                     <input
                       type="checkbox"
-                      value={t}
-                      checked={selectedTechnologies.includes(t)}
-                      onChange={() => handleCheckboxChange("technologies", t)}
-                      className="cursor-pointer"
+                      value={tech.value}
+                      {...register("technologies")}
+                      className="accent-blue-600"
                     />
-                    <span className="text-sm">{t}</span>
+                    <span>{tech.label}</span>
                   </label>
                 ))}
               </div>
               {errors.technologies && (
-                <p className="text-red-600 text-sm mt-1">{errors.technologies.message}</p>
+                <p className="text-red-600 text-sm mt-1">
+                  {errors.technologies.message}
+                </p>
               )}
             </div>
 
-            {/* Estágio */}
             <div>
-              <Label>Estágio</Label>
+              <Label>Seguimentos</Label>
+              <div className="flex flex-wrap gap-3 mt-2">
+                {SEGMENTS.map((seg) => (
+                  <label
+                    key={seg.value}
+                    className="flex items-center space-x-2 border rounded-md px-3 py-1 hover:bg-gray-50 cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      value={seg.value}
+                      {...register("segment")}
+                      className="accent-blue-600"
+                    />
+                    <span>{seg.label}</span>
+                  </label>
+                ))}
+              </div>
+              {errors.segment && (
+                <p className="text-red-600 text-sm mt-1">
+                  {errors.segment.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="stage">Estágio</Label>
               <select
+                id="stage"
                 {...register("stage")}
                 className="border rounded-lg w-full p-2 outline-none mt-1"
               >
-                <option value="">Selecione o estágio</option>
-                {STAGES.map((stage) => (
-                  <option key={stage} value={stage}>
-                    {stage}
-                  </option>
-                ))}
+                <option value="">Selecione o Estágio</option>
+                <option value="IDEATION">Ideação</option>
+                <option value="OPERATION">Operação</option>
+                <option value="TRACTION">Tração</option>
+                <option value="SCALE">Escala</option>
               </select>
-              {errors.stage && <p className="text-red-600 text-sm mt-1">{errors.stage.message}</p>}
+              {errors.stage && (
+                <span className="text-red-600 text-sm mt-1">
+                  {errors.stage.message}
+                </span>
+              )}
             </div>
 
-            {/* Problemas */}
             <div>
-              <Label>Problema</Label>
-              <Input type="text" placeholder="Descreva o problema" {...register("problems")} />
+              <Label htmlFor="problems">Problema</Label>
+              <Input
+                id="problems"
+                type="text"
+                placeholder="Descreva o problema"
+                {...register("problems")}
+              />
               {errors.problems && (
-                <span className="text-red-600 text-sm">{errors.problems.message}</span>
+                <span className="text-red-600 text-sm">
+                  {errors.problems.message}
+                </span>
               )}
             </div>
 
-            {/* Localização */}
             <div>
-              <Label>Localização</Label>
-              <Input type="text" placeholder="Ex: São Paulo - SP" {...register("location")} />
+              <Label htmlFor="location">Localização</Label>
+              <Input
+                id="location"
+                type="text"
+                placeholder="Ex: São Paulo - SP"
+                {...register("location")}
+              />
               {errors.location && (
-                <span className="text-red-600 text-sm">{errors.location.message}</span>
+                <span className="text-red-600 text-sm">
+                  {errors.location.message}
+                </span>
               )}
             </div>
 
-            {/* Fundadores */}
             <div>
               <Label>Fundadores</Label>
-              <Input type="text" placeholder="Nome do fundador" {...register("founders.0")} />
-              {errors.founders?.[0] && (
-                <span className="text-red-600 text-sm">{errors.founders[0].message}</span>
+              {founderFields.map((field, index) => (
+                <div key={field.id} className="flex gap-2 mt-2">
+                  <Input
+                    type="text"
+                    placeholder="Nome do fundador"
+                    {...register(`founders.${index}`)}
+                    className="flex-1"
+                  />
+                  {founderFields.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeFounder(index)}
+                      className="text-red-500 font-bold px-2"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+              ))}
+              {errors.founders && (
+                <span className="text-red-600 text-sm mt-1">
+                  {errors.founders.message || errors.founders[0]?.message}
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={() => appendFounder("")}
+                className="mt-2 text-blue-600 text-sm underline"
+              >
+                + Adicionar fundador
+              </button>
+            </div>
+
+            <div>
+              <Label htmlFor="pitch">Pitch</Label>
+              <Input
+                id="pitch"
+                type="text"
+                placeholder="Resumo do pitch"
+                {...register("pitch")}
+              />
+              {errors.pitch && (
+                <span className="text-red-600 text-sm">
+                  {errors.pitch.message}
+                </span>
               )}
             </div>
 
-            {/* Pitch */}
-            <div>
-              <Label>Pitch</Label>
-              <Input type="text" placeholder="Resumo do pitch" {...register("pitch")} />
-              {errors.pitch && <span className="text-red-600 text-sm">{errors.pitch.message}</span>}
-            </div>
-
-            {/* Links */}
             <div>
               <Label>Links</Label>
-              <Input
-                type="url"
-                placeholder="https://seusite.com"
-                {...register("links.0")}
-              />
-              {errors.links?.[0] && <span className="text-red-600 text-sm">{errors.links[0].message}</span>}
+              {linkFields.map((field, index) => (
+                <div key={field.id} className="flex gap-2 mt-2">
+                  <Input
+                    type="url"
+                    placeholder="https://exemplo.com"
+                    {...register(`links.${index}`)}
+                    className="flex-1"
+                  />
+                  {linkFields.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeLink(index)}
+                      className="text-red-500 font-bold px-2"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+              ))}
+              {errors.links && (
+                <span className="text-red-600 text-sm mt-1">
+                  {errors.links.message || errors.links[0]?.message}
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={() => appendLink("")}
+                className="mt-2 text-blue-600 text-sm underline"
+              >
+                + Adicionar link
+              </button>
             </div>
 
-            {/* Botões */}
             <div className="flex justify-end gap-3 pt-4">
-              <Button onClick={closeModal}>Cancelar</Button>
-              <Button>Enviar</Button>
+              <Button onClick={closeModal} disabled={isSubmitting}>
+                Cancelar
+              </Button>
+              <Button disabled={isSubmitting}>
+                {isSubmitting ? "Enviando..." : "Enviar"}
+              </Button>
             </div>
           </form>
         </ComponentCard>

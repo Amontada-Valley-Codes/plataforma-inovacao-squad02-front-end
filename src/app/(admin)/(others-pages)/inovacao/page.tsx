@@ -23,7 +23,7 @@ const PRIORITY_LABELS: Record<string, string> = {
   low: "Baixa"
 };
 
-const PRIORITY_VARIANTS: Record<string, any> = {
+const PRIORITY_VARIANTS: Record<string, string> = {
   high: "primary",
   medium: "outline",
   low: "secondary"
@@ -39,17 +39,12 @@ export default function ChallengesKanbanPage() {
     refreshChallenges
   } = useKanbanChallenges();
 
-  // Handler para quando as colunas mudam (drag and drop)
+
   const handleColumnsChange = React.useCallback(async (newColumns: Record<string, Challenge[]>) => {
-    console.log('');
-    console.log('🎯 ===== MUDANÇA DE COLUNAS DETECTADA =====');
     
-    // Compara o estado antigo com o novo para descobrir o que mudou
-    const oldChallenges = Object.values(columns).flat();
-    const newChallenges = Object.values(newColumns).flat();
+   
     
-    console.log('📊 Desafios antes:', oldChallenges.map(c => ({ id: c.id.slice(0,8), stage: c.funnelStage })));
-    console.log('📊 Desafios depois:', newChallenges.map(c => ({ id: c.id.slice(0,8), stage: c.funnelStage })));
+  
     
     // Encontra qual desafio mudou de coluna
     for (const [newColumnId, newColumnChallenges] of Object.entries(newColumns)) {
@@ -220,10 +215,7 @@ function ChallengeCard({ challenge, ...props }: ChallengeCardProps) {
             )}
           </div>
 
-          <div className="flex justify-between items-center text-[10px] text-muted-foreground">
-            <span>ID: {challenge.id.slice(0, 8)}...</span>
-            <span>Stage: {challenge.funnelStage}</span>
-          </div>
+          
         </div>
       </div>
     </Kanban.Item>
