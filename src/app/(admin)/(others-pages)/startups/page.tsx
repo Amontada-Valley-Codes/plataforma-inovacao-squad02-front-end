@@ -20,6 +20,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import Swal from "sweetalert2";
 
 const formSchema = z.object({
   name: z.string().min(3, "Digite o nome da Startup"),
@@ -147,6 +148,11 @@ export default function Page() {
       });
       setCurrentPage(1);
       await fetchStartups();
+      Swal.fire({
+        title: "Sucesso!",
+        icon: "success",
+        text: "Startup cadastrada com sucesso!",
+      });
     } catch (err) {
       console.error("Erro ao cadastrar startup:", err);
       setError("Erro ao cadastrar startup. Tente novamente.");

@@ -102,7 +102,7 @@ export default function StartupCard({
                     {/* Data de criação */}
                     <div className="flex gap-2 items-center text-gray-700 dark:text-gray-300 bg-orange-50 dark:bg-gray-800 px-3 py-2 rounded-lg border border-orange-100 dark:border-gray-700">
                         <CalendarClock size={18} className="text-orange-600" />
-                        <p className="text-sm font-medium">Criado em {formatDate(createdAt)}</p>
+                        <p className="text-sm font-medium">Criado em {createdAt}</p>
                     </div>
 
                     {/* Segmento principal */}
