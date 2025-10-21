@@ -9,7 +9,7 @@ import { ChallengeType } from "@/types/challenge";
 import Button from "@/components/ui/button/Button";
 
 type Props = {
-    challenge: ChallengeType;
+    challenge: ChallengeType ;
     isOpen: boolean;
     onClose: () => void;
     isAdmin?: boolean;
@@ -34,6 +34,8 @@ export default function DetalhesDesafio({ challenge, isOpen, onClose, isAdmin = 
         canceled: "Cancelado",
     };
 
+      
+
     const funnelStageTraduzido: Record<string, string> = {
         idea_generation: "Geração de Ideias",
         pre_screening: "Pré-Triagem",
@@ -48,10 +50,10 @@ export default function DetalhesDesafio({ challenge, isOpen, onClose, isAdmin = 
                 .then(res => setIdeias(res.data))
                 .catch(() => setIdeias([]));
         }
-    }, [isOpen, challenge.id]);
+    }, [isOpen, challenge?.id]);
 
     const getStatusColor = (status: string) => {
-        const statusLower = status.toLowerCase();
+        const statusLower = status.toLowerCase?.() ?? "";
         if (statusLower.includes('ativo') || statusLower.includes('active')) {
             return currentTheme === 'dark' ? 'bg-gradient-to-r from-green-700 to-emerald-800' : 'bg-gradient-to-r from-green-500 to-emerald-600';
         }
@@ -70,6 +72,8 @@ export default function DetalhesDesafio({ challenge, isOpen, onClose, isAdmin = 
             onClose();
         }
     };
+
+    if (!isOpen || !challenge) return null;
 
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
