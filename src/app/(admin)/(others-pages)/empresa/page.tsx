@@ -13,6 +13,7 @@ import api from "@/services/axiosServices";
 import { toast, Toaster } from "sonner"
 import { useEffect, useState } from "react";
 import Cards from "@/components/empresa/Cards";
+import Swal from "sweetalert2";
 
 
 
@@ -20,9 +21,7 @@ const formSchema = z.object({
     name:z.string().min(2, 'digite pelo menos 2 letras'),
     cnpj:z.string().max(14, "cnpj invalido"),
     description:z.string().min(3, 'digite pelo menos uma descriçao mais completa'),
-    managerName:z.string().min(2, 'digite pelo menos 2 letras'),
-    managerEmail:z.string().min(5, 'email muito curto'),
-    managerPassword:z.string().min(3, 'senha muito curta')
+    managerEmail:z.string().min(5, 'email muito curto')
 })
 
 type FormData = z.infer<typeof formSchema>
@@ -38,7 +37,7 @@ type Empresa = {
 
 export default function  Page(){
     const { isOpen, openModal, closeModal } = useModal();
-     const [empresas, setEmpresas] = useState<Empresa[]>([])
+    const [empresas, setEmpresas] = useState<Empresa[]>([])
     
 
     const {
@@ -72,8 +71,13 @@ export default function  Page(){
         try{
             const response = await api.post('/empresas/with-manager', data)
             console.log(response.data)
-            toast.success("Sucesso! Empresa Cadastrada!");
             setEmpresas((prev) => [...prev, response.data])
+            Swal.fire({
+                title: "Sucesso!",
+                text: "Empresa cadastrada com sucesso!",
+                icon: "success",
+                confirmButtonText: "OK"
+            });
 
         }catch(error){
             console.error('erro ao cadastar', error)
@@ -88,7 +92,6 @@ export default function  Page(){
         <div>
             <Toaster position="top-center" richColors />
             <div className="flex justify-between">
-              
 
             <p className="text-2xl">Cadastro de Empresa</p>
             <Button onClick={openModal} size="sm" variant="primary">Nova Empresa</Button>
@@ -102,7 +105,7 @@ export default function  Page(){
                     name={empresa.name}
                     cnpj={empresa.cnpj}
                     description={empresa.description}
-                    createdAt={empresa.createdAt}
+                    createdAt={new Date (empresa.createdAt).toLocaleDateString("pt-BR")}
                     />
                 ))}
             </div>
@@ -167,18 +170,6 @@ export default function  Page(){
                             </div>
 
                             <div>
-                                <Label>Nome Gerente</Label>
-                                <Input
-                                type="text"
-                                placeholder="Digite o o nome"
-                                {...register('managerName')}
-                                />
-                                {errors.managerName && (
-                                    <span className="text-red-600">{errors.managerName.message}</span>
-                                )}
-                            </div>
-
-                            <div>
                                  <Label>Email Gerente</Label>
                                 <Input
                                 type="text"
@@ -187,18 +178,6 @@ export default function  Page(){
                                 />
                                 {errors.managerEmail && (
                                     <span className="text-red-600">{errors.managerEmail.message}</span>
-                                )}
-
-                            </div>
-                            <div>
-                                  <Label>Senha Gerente</Label>
-                                <Input
-                                type="text"
-                                placeholder="Digite o senha gerente"
-                                {...register('managerPassword')}
-                                />
-                                {errors.managerPassword && (
-                                    <span className="text-red-600">{errors.managerPassword.message}</span>
                                 )}
 
                             </div>
