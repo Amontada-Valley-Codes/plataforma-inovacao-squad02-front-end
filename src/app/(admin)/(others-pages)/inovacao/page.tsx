@@ -313,16 +313,6 @@ function ChallengeCard({ challenge, ...props }: ChallengeCardProps) {
             )}
 
             <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
-              {assignee ? (
-                <div className="flex items-center gap-1">
-                  <div className="w-4 h-4 rounded-full bg-blue-200 flex-shrink-0" />
-                  <span className="line-clamp-1 text-[10px]">
-                    ID: {assignee.substring(0, 8)}...
-                  </span>
-                </div>
-              ) : (
-                <div />
-              )}
               {dueDate && (
                 <time className="text-[10px] tabular-nums flex-shrink-0">
                   {formatDate(dueDate)}
