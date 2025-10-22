@@ -49,7 +49,7 @@ const AppSidebar: React.FC = () => {
   
   const filteredNavItems = allNavItems.filter((item) => {
     if (userRole === "ADMIN") 
-      return [ "Perfil","Dashboard","Startups","Usuários","Empresa"].includes(item.name);
+      return [ "Perfil","Dashboard","Startups","Empresa"].includes(item.name);
     if (userRole === "MANAGER")
       return ["Usuários","Desafio","Perfil","Dashboard","Funil de inovações"].includes(item.name);
     if (userRole === "EVALUATOR")
