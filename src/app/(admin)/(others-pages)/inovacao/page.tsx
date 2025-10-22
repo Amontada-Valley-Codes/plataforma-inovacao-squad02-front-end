@@ -1,6 +1,6 @@
 "use client";
 
-import { GripVertical, Plus, Loader2, RefreshCw } from "lucide-react";
+import { GripVertical, Loader2, RefreshCw } from "lucide-react";
 import * as React from "react";
 
 import * as Kanban from "@/components/ui/kanban";
@@ -156,21 +156,12 @@ export default function ChallengesKanbanPage() {
     <div className="h-full flex flex-col">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold">Desafios Internos</h1>
+          <h1 className="text-2xl font-bold">Funil de Inovação  </h1>
           <p className="text-muted-foreground">
             Gerencie os desafios da sua empresa
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={refreshChallenges}>
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Atualizar
-          </Button>
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            Novo Desafio
-          </Button>
-        </div>
+        
       </div>
 
       <div className="flex-1 ">
@@ -343,13 +334,13 @@ function ChallengeColumn({
       <div className="flex items-center justify-between p-2">
         <div className="flex items-center gap-2">
           <span className="font-semibold text-sm">{COLUMN_TITLES[value]}</span>
-          <Badge>{challenges.length}</Badge>
+          <Badge>{challenges.length}</Badge>  
         </div>
-        <Kanban.ColumnHandle asChild>
-          <Button variant="outline" size="sm" className="cursor-grab">
-            <GripVertical className="h-4 w-4" />
-          </Button>
-        </Kanban.ColumnHandle>
+        {/* <Kanban.ColumnHandle asChild> */}
+          {/* <Button variant="outline" size="sm" className="cursor-grab"> */}
+            {/* <GripVertical className="h-4 w-4" /> */}
+          {/* </Button> */}
+        {/* </Kanban.ColumnHandle> */}
       </div>
 
       <div className="flex flex-col gap-2 p-2">
