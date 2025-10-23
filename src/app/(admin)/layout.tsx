@@ -5,6 +5,7 @@ import AppHeader from "@/layout/AppHeader";
 import AppSidebar from "@/layout/AppSidebar";
 import Backdrop from "@/layout/Backdrop";
 import React from "react";
+import { Toaster } from "sonner";
 
 export default function AdminLayout({
   children,
@@ -22,6 +23,8 @@ export default function AdminLayout({
 
   return (
     <div className="min-h-screen xl:flex">
+      <Toaster position="top-center" richColors />
+
       {/* Sidebar and Backdrop */}
       <AppSidebar />
       <Backdrop />

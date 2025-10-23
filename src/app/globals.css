@@ -1,10 +1,15 @@
 @import 'tailwindcss';
-@import "tw-animate-css";
+@plugin 'flowbite-react/plugin/tailwindcss';
+@source '../../.flowbite-react/class-list.json';
 
 @custom-variant dark (&:is(.dark *));
 
+  html {
+      scroll-behavior: smooth;
+    }
+
 @theme {
-  --font-*: initial;
+--font-*: initial;
   --font-outfit: Outfit, sans-serif;
 
   --breakpoint-*: initial;
@@ -39,31 +44,31 @@
   --color-white: #ffffff;
   --color-black: #101828;
 
-  --color-brand-25: #f2f7ff;
-  --color-brand-50: #ecf3ff;
-  --color-brand-100: #dde9ff;
-  --color-brand-200: #c2d6ff;
-  --color-brand-300: #9cb9ff;
-  --color-brand-400: #7592ff;
-  --color-brand-500: #465fff;
-  --color-brand-600: #3641f5;
-  --color-brand-700: #2a31d8;
-  --color-brand-800: #252dae;
-  --color-brand-900: #262e89;
-  --color-brand-950: #161950;
+  --color-brand-25: #fffaf5;
+  --color-brand-50: #fff6ed;
+  --color-brand-100: #ffead5;
+  --color-brand-200: #fddcab;
+  --color-brand-300: #feb273;
+  --color-brand-400: #fd853a;
+  --color-brand-500: #fb6514;
+  --color-brand-600: #ec4a0a;
+  --color-brand-700: #c4320a;
+  --color-brand-800: #9c2a10;
+  --color-brand-900: #7e2410;
+  --color-brand-950: #511c10;
 
-  --color-blue-light-25: #f5fbff;
-  --color-blue-light-50: #f0f9ff;
-  --color-blue-light-100: #e0f2fe;
-  --color-blue-light-200: #b9e6fe;
-  --color-blue-light-300: #7cd4fd;
-  --color-blue-light-400: #36bffa;
-  --color-blue-light-500: #0ba5ec;
-  --color-blue-light-600: #0086c9;
-  --color-blue-light-700: #026aa2;
-  --color-blue-light-800: #065986;
-  --color-blue-light-900: #0b4a6f;
-  --color-blue-light-950: #062c41;
+  --color-blue-light-25: #fffaf5;
+  --color-blue-light-50: #fff6ed;
+  --color-blue-light-100: #ffead5;
+  --color-blue-light-200: #fddcab;
+  --color-blue-light-300: #feb273;
+  --color-blue-light-400: #fd853a;
+  --color-blue-light-500: #fb6514;
+  --color-blue-light-600: #ec4a0a;
+  --color-blue-light-700: #c4320a;
+  --color-blue-light-800: #9c2a10;
+  --color-blue-light-900: #7e2410;
+  --color-blue-light-950: #511c10;
 
   --color-gray-25: #fcfcfd;
   --color-gray-50: #f9fafb;
@@ -198,7 +203,7 @@
 }
 
 @utility menu-item-active {
-  @apply bg-brand-50 text-brand-500 dark:bg-brand-500/[0.12] dark:text-brand-400;
+  @apply bg-orange-50 text-orange-500 dark:bg-orange-500/[0.12] dark:text-orange-400;
 }
 
 @utility menu-item-inactive {
@@ -210,7 +215,7 @@
 }
 
 @utility menu-item-icon-active {
-  @apply text-brand-500 dark:text-brand-400;
+  @apply text-orange-500 dark:text-orange-400;
 }
 
 @utility menu-item-icon-inactive {
@@ -234,7 +239,7 @@
 }
 
 @utility menu-dropdown-item-active {
-  @apply bg-brand-50 text-brand-500 dark:bg-brand-500/[0.12] dark:text-brand-400;
+  @apply bg-orange-50 text-orange-500 dark:bg-orange-500/[0.12] dark:text-orange-400;
 }
 
 @utility menu-dropdown-item-inactive {
@@ -242,15 +247,15 @@
 }
 
 @utility menu-dropdown-badge {
-  @apply block rounded-full px-2.5 py-0.5 text-xs font-medium uppercase text-brand-500 dark:text-brand-400;
+  @apply block rounded-full px-2.5 py-0.5 text-xs font-medium uppercase text-orange-500 dark:text-orange-400;
 }
 
 @utility menu-dropdown-badge-active {
-  @apply bg-brand-100 dark:bg-brand-500/20;
+  @apply bg-orange-100 dark:bg-orange-500/20;
 }
 
 @utility menu-dropdown-badge-inactive {
-  @apply bg-brand-50 group-hover:bg-brand-100 dark:bg-brand-500/15 dark:group-hover:bg-brand-500/20;
+  @apply bg-orange-50 group-hover:bg-orange-100 dark:bg-orange-500/15 dark:group-hover:bg-orange-500/20;
 }
 
 @utility no-scrollbar {
@@ -277,7 +282,7 @@
 }
 
 .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: #344054;
+  background-color: #3c485c;
 }
 
 @layer utilities {
@@ -454,7 +459,7 @@ span.flatpickr-weekday,
 .flatpickr-day.selected.nextMonthDay,
 .flatpickr-day.startRange.nextMonthDay,
 .flatpickr-day.endRange.nextMonthDay {
-  background: #465fff;
+  background: #f58d25 !important;
   @apply !border-brand-500 !bg-brand-500 hover:!border-brand-50 hover:!bg-brand-500;
 }
 .flatpickr-day.selected.startRange + .endRange:not(:nth-child(7n + 1)),
@@ -824,7 +829,7 @@ span.flatpickr-weekday,
 */
 
 .dark {
-  --background: oklch(0.145 0 0);
+  --background: oklch(38.582% 0.00406 16.738);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
@@ -856,6 +861,27 @@ span.flatpickr-weekday,
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 }
+
+/* global.css */
+::-webkit-scrollbar {
+  width: 6px; /* largura da barra vertical */
+  height: 6px; /* altura da barra horizontal */
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ff8c3a; /* cor do "thumb" (laranja Tailwind) */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #f8732c; /* cor ao passar o mouse */
+}
+
 
 /*
   ---break---
