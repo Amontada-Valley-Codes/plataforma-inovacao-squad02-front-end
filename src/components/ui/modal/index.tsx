@@ -53,10 +53,10 @@ export const Modal: React.FC<ModalProps> = ({
 
   const contentClasses = isFullscreen
     ? "w-full h-full"
-    : "relative w-2xl rounded bg-white  dark:bg-gray-900";
+    : "relative w-2xl rounded-2xl bg-white  dark:bg-gray-900";
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center overflow-y- modal z-99999">
+    <div className="fixed inset-0 flex items-center justify-center overflow-y- modal z-999">
       {!isFullscreen && (
         <div
           className="fixed inset-0 h-full w-full overflow-y-auto bg-black/30 backdrop-blur-sm"
@@ -71,12 +71,12 @@ export const Modal: React.FC<ModalProps> = ({
         {showCloseButton && (
           <button
             onClick={onClose}
-            className="absolute  mt-3 right-3 z-999 flex h-9.5 w-9.5 items-center justify-center rounded-full bg-gray-100  "
+            className="absolute  mt-3 right-3 z-999 flex h-9.5 w-9.5 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 transition"
           >
           <X/>
           </button>
         )}
-        <div className="max-h-[80vh] rounded-2xl overflow-y-auto ">
+        <div className="max-h-[95vh] rounded-2xl overflow-y-auto bg-">
           {children}
         </div>
       </div>
