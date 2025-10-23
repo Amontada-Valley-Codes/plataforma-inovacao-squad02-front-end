@@ -235,8 +235,7 @@ export default function Page() {
           },
         });
         const desafios = response.data.challenges;
-        console.log("Response data:", response.data);
-        setDesafios(prev => [...prev, ...desafios]);
+        setDesafios(desafios)
         setTotalPages(Math.ceil(response.data.pagination.total / response.data.pagination.limit));
       } catch (error) {
         console.error("Erro ao buscar desafios", error);

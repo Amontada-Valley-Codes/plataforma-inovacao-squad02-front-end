@@ -16,7 +16,6 @@ const profileSchema = z.object({
     (val) => !val || val.length >= 10,
     "Telefone deve ter pelo menos 10 dígitos"
   ),
-  companyId: z.string().optional(),
 });
 
 type ProfileFormData = z.infer<typeof profileSchema>;
@@ -65,8 +64,8 @@ export default function ProfilePage() {
   const fetchProfile = async () => {
     setLoading(true);
     try {
-      const response = await api.get("/users");
-      const userData = Array.isArray(response.data) ? response.data[0] : response.data;
+      const response = await api.get("/users/me");
+      const userData =response.data;
       setProfile(userData);
       setProfileImage(userData.profileImage || null);
       setImagePreview(userData.profileImage || null);
@@ -75,7 +74,6 @@ export default function ProfilePage() {
         name: userData.name,
         email: userData.email,
         phone: userData.phone || "",
-        companyId: userData.companyId || "",
       });
     } catch (error) {
       console.error("Erro ao buscar perfil", error);
@@ -101,7 +99,6 @@ export default function ProfilePage() {
       name: profile?.name,
       email: profile?.email,
       phone: profile?.phone || "",
-      companyId: profile?.companyId || "",
     });
   };
 
@@ -154,11 +151,10 @@ export default function ProfilePage() {
   const onSubmit = async (data: ProfileFormData) => {
     setSaving(true);
     try {
-      const response = await api.put("/users/profile", {
+      const response = await api.put("/users/me", {
         name: data.name,
         email: data.email,
         phone: data.phone || null,
-        companyId: data.companyId || null,
       });
 
       const updatedData = Array.isArray(response.data) ? response.data[0] : response.data;
@@ -407,36 +403,6 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Company ID */}
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Building2 className="w-6 h-6 text-amber-600 dark:text-amber-400" />
-              </div>
-              <div className="flex-1">
-                <Label className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">
-                  ID da Empresa
-                </Label>
-                {isEditing ? (
-                  <div>
-                    <Input
-                      type="text"
-                      {...register("companyId")}
-                      placeholder="Digite o ID da empresa (opcional)"
-                      className="text-lg font-mono"
-                    />
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Caso sua empresa possua um ID específico
-                    </p>
-                  </div>
-                ) : profile.companyId ? (
-                  <p className="text-sm font-mono text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-lg">
-                    {profile.companyId}
-                  </p>
-                ) : (
-                  <p className="text-gray-400 dark:text-gray-500 italic">Não informado</p>
-                )}
-              </div>
-            </div>
           </div>
 
           {/* Botões de Ação */}
@@ -446,7 +412,6 @@ export default function ProfilePage() {
                 onClick={handleCancel}
                 className="flex-1"
                 size="sm"
-                type="button"
               >
                 <X size={18} />
                 Cancelar
@@ -456,7 +421,6 @@ export default function ProfilePage() {
                 className="flex-1 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700"
                 size="sm"
                 disabled={saving}
-                type="button"
               >
                 {saving ? (
                   <>
