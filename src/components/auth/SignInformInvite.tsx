@@ -3,13 +3,12 @@
 import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
 import { useForm } from "react-hook-form";
-
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import api from "@/services/axiosServices";
 import Button from "../ui/button/Button";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { EyeIcon, EyeCloseIcon } from "@/icons";
 import { toast } from "sonner";
 import Image from "next/image";
@@ -21,7 +20,8 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>
 
-export default function SignInFormInvite(){
+
+function SignInFormContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const token = searchParams.get("token");
@@ -37,28 +37,28 @@ export default function SignInFormInvite(){
         resolver: zodResolver(formSchema),
     })
 
-    const onSubimit = async (data: FormData) =>{
+    const onSubimit = async (data: FormData) => {
         setLoading(true);
         try{
             const response = await api.post('/auth/register/invite',{
-            token,
-            name: data.name,
-            password: data.password
-        });
-        toast.success("Cadastro realizado com sucesso!"); 
-        window.history.replaceState(null, '', window.location.pathname);
-        console.log("Resposta do servidor:", response.data);
-        reset()
-        router.push('/signin');
+              token,
+              name: data.name,
+              password: data.password
+            });
+            toast.success("Cadastro realizado com sucesso!"); 
+            window.history.replaceState(null, '', window.location.pathname);
+            console.log("Resposta do servidor:", response.data);
+            reset()
+            router.push('/signin');
 
-        }catch(error){
-             console.error('Erro ao entar', error)
-        }finally {
-        setLoading(false);
+        } catch(error) {
+             console.error('Erro ao entrar', error)
+        } finally {
+            setLoading(false);
         }
     }
 
-    return(
+    return (
         <div className="flex justify-center items-center w-full">
           <form onSubmit={handleSubmit(onSubimit)} className="w-full max-w-md px-3 space-y-8">
             <div className="bg-white dark:bg-gray-800 rounded-3xl py-10 space-y-8 p-5">
@@ -71,7 +71,7 @@ export default function SignInFormInvite(){
                     className="w-40"
                     priority
                 />
-                </div>
+              </div>
 
               <div>
                 <Label>Digite seu nome: <span className="text-error-500">*</span></Label>
@@ -113,5 +113,17 @@ export default function SignInFormInvite(){
             </div>
           </form>
         </div>
+    )
+}
+
+export default function SignInFormInvite() {
+    return (
+        <Suspense fallback={
+            <div className="flex justify-center items-center w-full h-screen">
+                <div className="text-gray-600 dark:text-gray-400">Carregando...</div>
+            </div>
+        }>
+            <SignInFormContent />
+        </Suspense>
     )
 }

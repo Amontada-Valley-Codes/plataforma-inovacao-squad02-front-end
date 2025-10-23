@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { User, Mail, Phone, Building2, Shield, Edit2, Save, X, Loader2, Camera, Upload } from "lucide-react";
 import api from "@/services/axiosServices";
 import Button from "@/components/ui/button/Button";
@@ -57,15 +57,11 @@ export default function ProfilePage() {
     resolver: zodResolver(profileSchema),
   });
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     setLoading(true);
     try {
       const response = await api.get("/users/me");
-      const userData =response.data;
+      const userData = response.data;
       setProfile(userData);
       setProfileImage(userData.profileImage || null);
       setImagePreview(userData.profileImage || null);
@@ -81,7 +77,11 @@ export default function ProfilePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [reset]);
+
+  useEffect(() => {
+    fetchProfile();
+  }, [fetchProfile]);
 
   const showNotification = (message: string, type: string = "success") => {
     setNotification({ message, type });
