@@ -27,24 +27,24 @@ export interface UpdateChallengeData extends Partial<CreateChallengeData> {
   funnelStage?: string;
 }
 
-// Mapeamento das colunas para os valores da API
-export const COLUMN_TO_FUNNEL_STAGE: Record<string, string> = {
-  ideacao: 'IDEATION',
-  pretriagem: 'PRE_SCREENING',
-  colaboracao: 'IDEA_GENERATION',
-  avaliacao: 'DETAILED_SCREENING',
-  experimentacao: 'EXPERIMENTATION',
+
+export const COLUMN_TO_FUNNEL_STAGE = {
+  idea_generation: "IDEA_GENERATION",
+  pre_screening: "PRE_SCREENING",
+  ideation: "IDEATION",
+  detailed_screening: "DETAILED_SCREENING",
+  experimentation: "EXPERIMENTATION",
 };
 
 export const FUNNEL_STAGE_TO_COLUMN: Record<string, string> = {
-  IDEA_GENERATION: 'colaboracao',
-  PRE_SCREENING: 'pretriagem',
-  IDEATION: 'ideacao',
-  DETAILED_SCREENING: 'avaliacao',
-  EXPERIMENTATION: 'experimentacao',
+  IDEA_GENERATION: "idea_generation",
+  PRE_SCREENING: "pre_screening",
+  IDEATION: "ideation",
+  DETAILED_SCREENING: "detailed_screening",
+  EXPERIMENTATION: "experimentation",
 };
 
-// Função auxiliar para organizar desafios por etapa
+
 function organizeChallengesByFunnelStage(challenges: Challenge[]): Record<string, Challenge[]> {
   const organized: Record<string, Challenge[]> = {
     ideacao: [],
@@ -59,7 +59,6 @@ function organizeChallengesByFunnelStage(challenges: Challenge[]): Record<string
     if (column && organized[column]) {
       organized[column].push(challenge);
     } else {
-      // Se não encontrar a coluna, adiciona em ideação por padrão
       console.warn(`FunnelStage desconhecido: ${challenge.funnelStage}`);
       organized.ideacao.push(challenge);
     }
@@ -68,9 +67,9 @@ function organizeChallengesByFunnelStage(challenges: Challenge[]): Record<string
   return organized;
 }
 
-// Serviços da API
+
 export const challengeService = {
-  // Criar um novo desafio
+
   async createChallenge(data: CreateChallengeData): Promise<Challenge> {
     try {
       const response = await api.post('/internal/challenges', data);
@@ -81,14 +80,13 @@ export const challengeService = {
     }
   },
 
-  // Listar todos os desafios com paginação
+
   async getChallenges(page: number = 0, size: number = 100): Promise<Challenge[]> {
     try {
       const response = await api.get('/internal/challenges', {
         params: { page, size }
       });
       
-      // Trata diferentes formatos de resposta
       if (Array.isArray(response.data)) {
         return response.data;
       }
@@ -101,13 +99,12 @@ export const challengeService = {
       return [];
       
     } catch (error: any) {
-      // Não loga erro aqui pois o fallback vai resolver
-      // Apenas lança o erro para ativar o método alternativo
+
       throw error;
     }
   },
 
-  // Obter um desafio pelo ID
+
   async getChallengeById(id: string): Promise<Challenge> {
     try {
       const response = await api.get(`/internal/challenges/${id}`);
@@ -118,7 +115,7 @@ export const challengeService = {
     }
   },
 
-  // Atualizar um desafio
+
   async updateChallenge(id: string, data: UpdateChallengeData): Promise<Challenge> {
     try {
       const response = await api.put(`/internal/challenges/${id}`, data);
@@ -129,7 +126,6 @@ export const challengeService = {
     }
   },
 
-  // Deletar um desafio (apenas MANAGER)
   async deleteChallenge(id: string): Promise<void> {
     try {
       await api.delete(`/internal/challenges/${id}`);
@@ -139,14 +135,14 @@ export const challengeService = {
     }
   },
 
-  // Listar desafios por etapa do funil
+
   async getChallengesByFunnelStage(funnelStage: string): Promise<Challenge[]> {
     try {
       const response = await api.get('/internal/challenges/status/funnelStage', {
         params: { funnelStage }
       });
       
-      // Trata diferentes formatos de resposta
+
       if (Array.isArray(response.data)) {
         return response.data;
       }

@@ -19,9 +19,9 @@ import Swal from "sweetalert2";
 
 const formSchema = z.object({
     name:z.string().min(2, 'digite pelo menos 2 letras'),
-    cnpj:z.string().max(14, "cnpj invalido"),
+    cnpj:z.string().max(18, "cnpj invalido"),
     description:z.string().min(3, 'digite pelo menos uma descriçao mais completa'),
-    managerEmail:z.string().min(5, 'email muito curto')
+    managerEmail:z.string().min(5, 'email muito curto'),
 })
 
 type FormData = z.infer<typeof formSchema>
@@ -179,6 +179,7 @@ export default function  Page(){
                                 {errors.managerEmail && (
                                     <span className="text-red-600">{errors.managerEmail.message}</span>
                                 )}
+
 
                             </div>
 
