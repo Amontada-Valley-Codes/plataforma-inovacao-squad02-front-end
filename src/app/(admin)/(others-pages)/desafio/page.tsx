@@ -33,7 +33,6 @@ const formSchema = z
     endDate: z.date("Selecione a data final"),
     theme: z.string().min(3, "Digite mais detalhes para o tema"),
     description: z.string().min(3, "Digite uma descrição mais completa"),
-    visibility: z.enum(["PUBLIC", "INTERNAL"], "selecione Uma Opção"),
   })
   .refine((data) => data.endDate > data.startDate, {
     message: "A data final deve ser depois da data de início",
@@ -216,7 +215,6 @@ export default function Page() {
       description: desafio.description,
       startDate: new Date(desafio.startDate),
       endDate: new Date(desafio.endDate),
-      visibility: desafio.visibility,
     });
     setEditModalOpen(true);
   };
@@ -236,9 +234,9 @@ export default function Page() {
             limit: 15,
           },
         });
-        const desafios = response.data.data;
-        setDesafios(desafios);
-        setTotalPages(Math.ceil(response.data.total / response.data.limit));
+        const desafios = response.data.challenges;
+        setDesafios(desafios)
+        setTotalPages(Math.ceil(response.data.pagination.total / response.data.pagination.limit));
       } catch (error) {
         console.error("Erro ao buscar desafios", error);
         setError("Erro ao carregar desafios.");
@@ -434,20 +432,6 @@ export default function Page() {
                   )}
                 </div>
 
-                <div>
-                  <Label>Visibilidade</Label>
-                  <select
-                    className="px-5 py-2 w-full border rounded"
-                    {...register("visibility")}
-                  >
-                    <option value="">Selecione uma opção</option>
-                    <option value="PUBLIC">Público</option>
-                    <option value="INTERNAL">Interno</option>
-                  </select>
-                  {errors.visibility && (
-                    <span className="text-red-600">{errors.visibility.message}</span>
-                  )}
-                </div>
 
                 <Button className="w-full mt-2" size="sm">
                   Criar Desafio
@@ -546,21 +530,6 @@ export default function Page() {
                     <span className="text-red-600">
                       {editErrors.description.message}
                     </span>
-                  )}
-                </div>
-
-                <div>
-                  <Label>Visibilidade</Label>
-                  <select
-                    className="px-5 py-2 w-full border rounded"
-                    {...editRegister("visibility")}
-                  >
-                    <option value="">Selecione uma opção</option>
-                    <option value="PUBLIC">Público</option>
-                    <option value="INTERNAL">Interno</option>
-                  </select>
-                  {editErrors.visibility && (
-                    <span className="text-red-600">{editErrors.visibility.message}</span>
                   )}
                 </div>
 
