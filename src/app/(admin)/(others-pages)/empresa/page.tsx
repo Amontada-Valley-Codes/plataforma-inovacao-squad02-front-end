@@ -77,13 +77,13 @@ export default function Page() {
       const message = `Olá, Você foi convidado para gerenciar a empresa ${newCompany.name}
       .Clique no link abaixo para  completar seu cadastro 
 
-      ${manager.zap}`;
+      ${manager.inviteLink}`;
 
       const phone = data.managerPhone.replace(/\D/g, "");
 
       const whatsappLink = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
       window.open(whatsappLink, "_blank");
-      
+        
     } catch (error) {
       console.error("erro ao cadastar", error);
       toast.error("erro no cadastro");
