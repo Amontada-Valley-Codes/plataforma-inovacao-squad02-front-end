@@ -5,13 +5,11 @@ import ListCompany from "@/components/screemAdm/ListCompany";
 import { CardsAdm } from "@/components/screemAdm/CardsAdm";
 import FunnelCategory from "@/components/screemAdm/FunnerCategories";
 
-
 export const metadata: Metadata = {
-  title:
-    "Hive Hub | Colmeia de ideias",
+  title: "Hive Hub | Colmeia de ideias",
   description: "Plataforma de inovações",
   icons: {
-  icon: 'hivehub-icon.png'
+    icon: "hivehub-icon.png",
   },
 };
 

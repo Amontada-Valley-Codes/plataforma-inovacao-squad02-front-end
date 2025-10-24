@@ -1,10 +1,7 @@
 "use client";
 import { ApexOptions } from "apexcharts";
 import dynamic from "next/dynamic";
-import { MoreDotIcon } from "@/icons"; 
-import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { useState } from "react";
-import { Dropdown } from "../ui/dropdown/Dropdown";
 
 // Cor de destaque
 const HIGHLIGHT_COLOR = "#fb6514";
@@ -70,9 +67,6 @@ export default function FunnelCategory() {
     },
   ];
   const [isOpen, setIsOpen] = useState(false);
-
-  function toggleDropdown() { setIsOpen(!isOpen); }
-  function closeDropdown() { setIsOpen(false); }
 
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:pt-6">

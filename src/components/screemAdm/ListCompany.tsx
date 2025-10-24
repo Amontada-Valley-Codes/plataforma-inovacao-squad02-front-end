@@ -34,7 +34,7 @@ const tableData: Product[] = [
   },
   {
     id: 3,
-    name: "Cabaré Tech",
+    name: "HexTech",
     users: "5",
     challengeAtv: "2",
     challengeCpl: 1,
@@ -64,7 +64,7 @@ export default function ListCompany() {
           <h3 className="text-xl font-bold text-[#fb6514]">
             Lista de Empresas
           </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Visão gneral das Empresas</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Visão geral das Empresas</p>
         </div>
       </div>
       <div className="max-w-full overflow-x-auto">
