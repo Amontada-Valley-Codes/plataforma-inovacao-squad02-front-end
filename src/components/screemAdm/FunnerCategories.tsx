@@ -1,31 +1,77 @@
 "use client";
+
 import { ApexOptions } from "apexcharts";
 import dynamic from "next/dynamic";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
-// Cor de destaque
 const HIGHLIGHT_COLOR = "#fb6514";
 
-// Dynamically import the ReactApexChart component
 const ReactApexChart = dynamic(() => import("react-apexcharts"), {
   ssr: false,
 });
 
+const API_BASE_URL = "https://loyal-cooperation-production.up.railway.app";
+
+interface MonthlyData {
+  month: number;
+  monthName: string;
+  totalChallenges: number;
+}
+
+interface TimelineResponse {
+  year: number;
+  totalChallenges: number;
+  monthly: MonthlyData[];
+}
+
 export default function FunnelCategory() {
-  
-  // Obtém o ano atual para o título
-  const currentYear = new Date().getFullYear(); 
+  const currentYear = new Date().getFullYear();
+
+  const [series, setSeries] = useState([
+    { name: "Desafios Lançados", data: Array(12).fill(0) },
+  ]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchTimeline = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const res = await axios.get<TimelineResponse>(
+          `${API_BASE_URL}/dashboard/challenges/timeline?year=${currentYear}`
+        );
+
+        const { monthly } = res.data;
+
+        const sorted = [...monthly].sort((a, b) => a.month - b.month);
+
+        const monthlyTotals = sorted.map((m) => m.totalChallenges);
+
+        setSeries([{ name: "Desafios Lançados", data: monthlyTotals }]);
+
+        console.log("Dados carregados do backend:", res.data);
+      } catch (err: any) {
+        console.error("Erro ao buscar timeline:", err);
+        setError("Erro ao carregar dados do gráfico.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTimeline();
+  }, [currentYear]);
+
 
   const options: ApexOptions = {
-    // ... (Configurações do gráfico mantidas)
     colors: [HIGHLIGHT_COLOR],
     chart: {
       fontFamily: "Outfit, sans-serif",
       type: "bar",
       height: 180,
-      toolbar: {
-        show: false,
-      },
+      toolbar: { show: false },
     },
     plotOptions: {
       bar: {
@@ -38,41 +84,50 @@ export default function FunnelCategory() {
     dataLabels: { enabled: false },
     stroke: { show: true, width: 4, colors: ["transparent"] },
     xaxis: {
-      // ** MESES EM PORTUGUÊS **
       categories: [
-        "Jan", "Fev", "Mar", "Abr", "Mai", "Jun", 
+        "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
         "Jul", "Ago", "Set", "Out", "Nov", "Dez",
       ],
       axisBorder: { show: false },
       axisTicks: { show: false },
     },
-    legend: { show: true, position: "top", horizontalAlign: "left", fontFamily: "Outfit" },
-    yaxis: {
-      title: { text: undefined },
+    legend: {
+      show: true,
+      position: "top",
+      horizontalAlign: "left",
+      fontFamily: "Outfit",
     },
+    yaxis: { title: { text: undefined } },
     grid: { yaxis: { lines: { show: true } } },
     fill: { opacity: 1 },
     tooltip: {
       x: { show: false },
-      y: {
-        formatter: (val: number) => `${val} desafios`,
-      },
+      y: { formatter: (val: number) => `${val} desafios` },
     },
   };
-  
-  const series = [
-    {
-      name: "Desafios Lançados", 
-      data: [35, 42, 55, 30, 68, 75, 50, 48, 85, 90, 78, 95], // Dados de exemplo
-    },
-  ];
-  const [isOpen, setIsOpen] = useState(false);
+
+  if (loading) {
+    return (
+      <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+        <p className="text-gray-500 dark:text-gray-400 animate-pulse">
+          Carregando dados do gráfico...
+        </p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-2xl border border-red-300 bg-red-50 p-6 dark:border-red-800 dark:bg-red-900/10">
+        <p className="text-red-600 dark:text-red-400 text-center">{error}</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:pt-6">
-      <div className="flex items-center justify-between">
-        {/* TÍTULO EM PORTUGUÊS */}
-        <h3 className={`text-lg font-semibold text-gray-800 dark:text-white/90`}>
+    <div className="overflow-hidden rounded-2xl border-1 border-l-4 border-[#fb6514] bg-white px-5 pt-5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:pt-6">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
           Desafios Lançados ({currentYear})
         </h3>
       </div>

@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import React from "react";
-import StatisticsChart from "@/components/ecommerce/StatisticsChart";
 import ListCompany from "@/components/screemAdm/ListCompany";
-import { CardsAdm } from "@/components/screemAdm/CardsAdm";
+import CardsAdm from "@/components/screemAdm/CardsAdm";
 import FunnelCategory from "@/components/screemAdm/FunnerCategories";
 
 export const metadata: Metadata = {
@@ -20,10 +19,6 @@ export default function Ecommerce() {
         <CardsAdm />
         <FunnelCategory />
       </div>
-
-      {/* <div className="col-span-12">
-        <StatisticsChart />
-      </div> */}
 
       <div className="col-span-12 xl:col-span-12">
         <ListCompany />
