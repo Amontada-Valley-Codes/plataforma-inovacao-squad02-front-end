@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { User, Mail, Phone, Building2, Shield, Edit2, Save, X, Loader2, Camera } from "lucide-react";
 import api from "@/services/axiosServices";
 import Button from "@/components/ui/button/Button";
@@ -55,11 +55,7 @@ export default function ProfilePage() {
     resolver: zodResolver(profileSchema),
   });
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     setLoading(true);
     try {
       const response = await api.get("/users/me");
@@ -82,7 +78,11 @@ export default function ProfilePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [reset]);
+
+  useEffect(() => {
+    fetchProfile();
+  }, [fetchProfile]);
 
   const showNotification = (message: string, type: string = "success") => {
     setNotification({ message, type });
@@ -366,7 +366,7 @@ export default function ProfilePage() {
             {!isEditing && (
               <Button
                 onClick={handleEdit}
-                className="bg-white hover:bg-orange-50 dark:bg-gray-800 text-orange-600 dark:text-orange-400 dark:hover:bg-gray-700 mt-4 sm:mt-0 w-full sm:w-auto justify-center"
+                className="bg-orange-600 hover:bg-orange-500 dark:bg-gray-800 text-orange-400 dark:text-orange-400 dark:hover:bg-gray-700 mt-4 sm:mt-0 w-full sm:w-auto justify-center"
                 size="sm"
               >
                 <Edit2 size={18}/>
