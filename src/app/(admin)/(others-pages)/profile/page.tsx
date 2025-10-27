@@ -24,16 +24,20 @@ type UserProfile = {
   email: string;
   phone: string | null;
   role: string;
-  picture: string | null;
+  pictures: {
+    url: string;
+    public_id?: string;
+  } | null;
   company: {
     name: string;
-  };
+  } | null;
 };
 
 const roleTranslations: { [key: string]: string } = {
   ADMIN: "Administrador",
   MANAGER: "Gerente",
   USER: "Usuário",
+  EVALUATOR: "Avaliador",
 };
 
 export default function ProfilePage() {
@@ -54,10 +58,6 @@ export default function ProfilePage() {
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
   });
-
-  useEffect(() => {
-    fetchProfile();
-  }, []);
 
   const fetchProfile = async () => {
     setLoading(true);
@@ -84,6 +84,11 @@ export default function ProfilePage() {
     }
   };
 
+  useEffect(() => {
+    fetchProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const showNotification = (message: string, type: string = "success") => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 3000);
@@ -97,8 +102,9 @@ export default function ProfilePage() {
     setIsEditing(false);
     setImageFile(null);
     
-    const hasImage = profile?.picture && profile.picture !== "none";
-    setImagePreview(hasImage ? profile.picture : null);
+    // Restaurar imagem original
+    const hasImage = profile?.pictures?.url && profile.pictures.url !== "none";
+    setImagePreview(hasImage ? profile.pictures.url : null);
     
     reset({
       name: profile?.name,
@@ -145,13 +151,14 @@ export default function ProfilePage() {
     setError(null);
     
     try {
-      // Criar FormData para enviar tudo junto
+      // Criar FormData com TODOS os campos juntos
       const formData = new FormData();
       
-      // Adicionar dados do formulário
+      // Adicionar campos obrigatórios
       formData.append("name", data.name);
       formData.append("email", data.email);
       
+      // Adicionar campos opcionais
       if (data.phone && data.phone.trim() !== "") {
         formData.append("phone", data.phone);
       }
@@ -160,9 +167,10 @@ export default function ProfilePage() {
         formData.append("password", data.password);
       }
 
-      // Se houver imagem, adicionar ao FormData
+      // Adicionar imagem se houver (campo newImage conforme documentação)
       if (imageFile) {
-        formData.append("newImage", imageFile, imageFile.name);
+        // NÃO adicionar o nome do arquivo, apenas o File object
+        formData.append("newImage", imageFile);
         
         console.log("Enviando com imagem:", {
           fileName: imageFile.name,
@@ -173,11 +181,21 @@ export default function ProfilePage() {
 
       console.log("FormData entries:");
       for (let pair of formData.entries()) {
-        console.log(pair[0], typeof pair[1] === 'object' ? `File: ${(pair[1] as File).name}` : pair[1]);
+        if (pair[1] instanceof File) {
+          console.log(pair[0], `File: ${pair[1].name}`);
+        } else {
+          console.log(pair[0], pair[1]);
+        }
       }
 
-      // Enviar requisição com FormData
-      const response = await api.put("/users/me", formData);
+      // IMPORTANTE: Forçar o header correto e remover qualquer Content-Type pré-definido
+      const response = await api.put("/users/me", formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        // Garantir que o axios não transforme o FormData
+        transformRequest: [(data) => data],
+      });
 
       console.log("Resposta da API:", response.data);
 
@@ -185,8 +203,8 @@ export default function ProfilePage() {
       setProfile(updatedData);
       
       // Atualizar preview com a URL retornada pela API
-      const hasImage = updatedData.picture && updatedData.picture !== "none";
-      setImagePreview(hasImage ? updatedData.picture : null);
+      const hasImage = updatedData.pictures?.url && updatedData.pictures.url !== "none";
+      setImagePreview(hasImage ? updatedData.pictures.url : null);
       
       setImageFile(null);
       setIsEditing(false);
@@ -223,6 +241,8 @@ export default function ProfilePage() {
             ? error.response.data.errors.join(', ')
             : JSON.stringify(error.response.data.errors);
         }
+      } else if (error.message) {
+        errorMessage = error.message;
       }
       
       setError(errorMessage);
