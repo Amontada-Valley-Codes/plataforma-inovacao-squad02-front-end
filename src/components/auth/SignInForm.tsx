@@ -61,11 +61,11 @@ export default function SignInForm() {
     router.push('/deshboard');
 
      if (role === "ADMIN") {
-      router.push("/deshboard");
+      router.push("/dashboardAdm");
     } else if (role === "MANAGER") {
-      router.push("/Usuarios");
+      router.push("/dashboardGer");
     } else if (role === "EVALUATOR") {
-      router.push("/desafio");
+      router.push("/deshboard");
     } else {
       router.push("/deshboard");
     }
