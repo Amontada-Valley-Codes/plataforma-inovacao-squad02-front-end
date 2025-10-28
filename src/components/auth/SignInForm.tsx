@@ -13,6 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
 import api from "@/services/axiosServices";
 import Image from "next/image";
+import { getUserRole } from "@/utils/getUserRole";
 
 
 
@@ -48,10 +49,26 @@ export default function SignInForm() {
       email:data.email,
       password:data.password
     })
-    // console.log("login Realizado:", response.data);
-    localStorage.setItem("token", response.data.access_token);
+
+    const role = getUserRole();
+    const {access_token, user } = response.data
+
+
+    
+    localStorage.setItem("token", access_token);
+    
     toast.success("Sucesso! Operação realizada.");
     router.push('/deshboard');
+
+     if (role === "ADMIN") {
+      router.push("/deshboard");
+    } else if (role === "MANAGER") {
+      router.push("/Usuarios");
+    } else if (role === "EVALUATOR") {
+      router.push("/desafio");
+    } else {
+      router.push("/deshboard");
+    }
     reset()
     }catch(error){
       console.error('Erro ao entar', error)
