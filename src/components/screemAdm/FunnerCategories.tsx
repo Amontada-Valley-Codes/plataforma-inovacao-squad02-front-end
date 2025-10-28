@@ -4,6 +4,7 @@ import { ApexOptions } from "apexcharts";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import api from "@/services/axiosServices";
 
 const HIGHLIGHT_COLOR = "#fb6514";
 
@@ -11,7 +12,7 @@ const ReactApexChart = dynamic(() => import("react-apexcharts"), {
   ssr: false,
 });
 
-const API_BASE_URL = "https://loyal-cooperation-production.up.railway.app";
+
 
 interface MonthlyData {
   month: number;
@@ -40,8 +41,8 @@ export default function FunnelCategory() {
         setLoading(true);
         setError(null);
 
-        const res = await axios.get<TimelineResponse>(
-          `${API_BASE_URL}/dashboard/challenges/timeline?year=${currentYear}`
+        const res = await api.get<TimelineResponse>(
+          `/dashboard/challenges/timeline?year=${currentYear}`
         );
 
         const { monthly } = res.data;

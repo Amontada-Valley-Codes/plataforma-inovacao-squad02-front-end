@@ -6,11 +6,11 @@ import { LuBuilding2, LuBrainCircuit, LuRocket, LuUsers } from "react-icons/lu";
 import { IoExtensionPuzzleOutline } from "react-icons/io5";
 import { BsBuilding } from "react-icons/bs";
 import { GoLightBulb } from "react-icons/go";
-import { BiWrench } from "react-icons/bi";
+import api from "@/services/axiosServices";
 
 const HIGHLIGHT_COLOR = "#fb6514";
 
-const API_BASE_URL = "https://loyal-cooperation-production.up.railway.app";
+
 interface MetricCardProps {
   icon: React.ReactNode;
   title: string;
@@ -80,17 +80,21 @@ export const CardsAdm: React.FC = () => {
           resPublicChallenges,
           resUsers,
           resAllChallenges,
+          resStartups, // Corrigido aqui
         ] = await Promise.all([
-          axios.get(`${API_BASE_URL}/dashboard/companies?page=1&limit=1`),
-          axios.get(`${API_BASE_URL}/dashboard/challenges/private?page=1&limit=10`),
-          axios.get(`${API_BASE_URL}/dashboard/challenges/public?page=1&limit=10`),
-          axios.get(`${API_BASE_URL}/dashboard/users?page=1&limit=10`),
-          axios.get(`${API_BASE_URL}/dashboard/challenges?page=1&limit=10`),
+          api.get('/dashboard/companies?page=1&limit=1'),
+          api.get('/dashboard/challenges/private?page=1&limit=10'),
+          api.get('/dashboard/challenges/public?page=1&limit=10'),
+          api.get('/dashboard/users?page=1&limit=10'),
+          api.get('/dashboard/challenges?page=1&limit=10'),
+          api.get('/dashboard/startups?page=1&limit=10'),
+          api.get('/dashboard/completed-activities?page=1&limit=10'),
+          api.get('/dashboard/matchs?page=1&limit=10'),
         ]);
 
         const newMetrics: MetricsData = {
           empresas: resCompanies.data?.total ?? 0,
-          startups: 0, 
+          startups: resStartups.data?.total ?? 0,
           desafiosPrivados: resPrivateChallenges.data?.total ?? 0,
           desafiosPublicos: resPublicChallenges.data?.total ?? 0,
           todosOsDesafios: resAllChallenges.data?.total ?? 0,
@@ -140,12 +144,36 @@ export const CardsAdm: React.FC = () => {
   const metrics = [
     { title: "Empresas", value: metricsData.empresas, icon: <BsBuilding /> },
     { title: "Startups", value: metricsData.startups, icon: <LuBuilding2 /> },
-    { title: "Desafios Privados", value: metricsData.desafiosPrivados, icon: <GoLightBulb /> },
-    { title: "Desafios Públicos", value: metricsData.desafiosPublicos, icon: <IoExtensionPuzzleOutline /> },
-    { title: "Todos os Desafios", value: metricsData.todosOsDesafios, icon: <BiWrench /> },
-    { title: "Total de Usuários", value: metricsData.totalUsuarios, icon: <LuUsers /> },
-    { title: "Atividades Concluídas", value: metricsData.atividadesConcluidas, icon: <LuBrainCircuit /> },
-    { title: "Total de Match's", value: metricsData.matches, icon: <LuRocket /> },
+    {
+      title: "Desafios Privados",
+      value: metricsData.desafiosPrivados,
+      icon: <GoLightBulb />,
+    },
+    {
+      title: "Desafios Públicos",
+      value: metricsData.desafiosPublicos,
+      icon: <GoLightBulb />,
+    },
+    {
+      title: "Todos os Desafios",
+      value: metricsData.todosOsDesafios,
+      icon: <IoExtensionPuzzleOutline />,
+    },
+    {
+      title: "Total de Usuários",
+      value: metricsData.totalUsuarios,
+      icon: <LuUsers />,
+    },
+    {
+      title: "Atividades Concluídas",
+      value: metricsData.atividadesConcluidas,
+      icon: <LuBrainCircuit />,
+    },
+    {
+      title: "Total de Match's",
+      value: metricsData.matches,
+      icon: <LuRocket />,
+    },
   ];
 
   return (
