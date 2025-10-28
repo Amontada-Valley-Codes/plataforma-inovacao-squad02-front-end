@@ -47,11 +47,11 @@ export const FUNNEL_STAGE_TO_COLUMN: Record<string, string> = {
 
 function organizeChallengesByFunnelStage(challenges: Challenge[]): Record<string, Challenge[]> {
   const organized: Record<string, Challenge[]> = {
-    ideacao: [],
-    pretriagem: [],
-    colaboracao: [],
-    avaliacao: [],
-    experimentacao: [],
+    idea_generation: [],
+    pre_screening: [],
+    ideation: [],
+    detailed_screening: [],
+    experimentation: [],
   };
 
   challenges.forEach(challenge => {
@@ -60,13 +60,12 @@ function organizeChallengesByFunnelStage(challenges: Challenge[]): Record<string
       organized[column].push(challenge);
     } else {
       console.warn(`FunnelStage desconhecido: ${challenge.funnelStage}`);
-      organized.ideacao.push(challenge);
+      organized.idea_generation.push(challenge);
     }
   });
 
   return organized;
 }
-
 
 export const challengeService = {
 
@@ -81,26 +80,15 @@ export const challengeService = {
   },
 
 
-  async getChallenges(page: number = 0, size: number = 100): Promise<Challenge[]> {
+  async getChallenges(page: number = 1, size: number = 10): Promise<Challenge[]> {
     try {
       const response = await api.get('/internal/challenges', {
-        params: { page, size }
+        params: { page, limit: size }
       });
-      
-      if (Array.isArray(response.data)) {
-        return response.data;
-      }
-      
-      if (response.data.content && Array.isArray(response.data.content)) {
-        return response.data.content;
-      }
-      
-      console.warn('Formato de resposta inesperado:', response.data);
-      return [];
-      
+      return response.data.challenges || [];
     } catch (error: any) {
-
-      throw error;
+      console.error('Erro ao buscar desafios:', error.response?.data || error.message);
+      throw new Error(error.response?.data?.message || 'Erro ao buscar desafios');
     }
   },
 
@@ -126,6 +114,7 @@ export const challengeService = {
     }
   },
 
+
   async deleteChallenge(id: string): Promise<void> {
     try {
       await api.delete(`/internal/challenges/${id}`);
@@ -138,114 +127,65 @@ export const challengeService = {
 
   async getChallengesByFunnelStage(funnelStage: string): Promise<Challenge[]> {
     try {
-      const response = await api.get('/internal/challenges/status/funnelStage', {
+      const response = await api.get('/internal/challenges/filter', {
         params: { funnelStage }
       });
-      
-
-      if (Array.isArray(response.data)) {
-        return response.data;
-      }
-      
-      if (response.data.content && Array.isArray(response.data.content)) {
-        return response.data.content;
-      }
-      
-      console.warn(`Formato inesperado para ${funnelStage}:`, response.data);
-      return [];
-      
+      return Array.isArray(response.data) ? response.data : response.data.challenges || [];
     } catch (error: any) {
       console.error(`Erro ao buscar desafios para ${funnelStage}:`, {
         status: error.response?.status,
         data: error.response?.data
       });
-      
-      // Se for 403 ou 500, retorna array vazio em vez de quebrar
-      if (error.response?.status === 403 || error.response?.status === 500) {
-        console.warn(`Status ${error.response?.status} para ${funnelStage}. Retornando vazio.`);
-        return [];
-      }
-      
       return [];
     }
   },
 
-  // Atualizar etapa do funil de um desafio
+ 
   async updateChallengeFunnelStage(id: string, funnelStage: string): Promise<void> {
-    try {
-      console.log('📡 Atualizando etapa do desafio:', { id, funnelStage });
-      
-      const url = `/internal/challenges/status/${id}`;
-      console.log('🔗 URL completa:', `${url}?funnelStage=${funnelStage}`);
-      
-      // Faz a requisição PUT SEM BODY (apenas query parameter)
-      // O backend não espera body, apenas o query parameter
-      const response = await api.put(`${url}?funnelStage=${funnelStage}`);
-      
-      console.log('✅ Resposta da API:', response.data);
-      console.log('✅ Status:', response.status);
-      return response.data;
-    } catch (error: any) {
-      console.error('❌ ERRO COMPLETO ao atualizar etapa:', {
-        id,
-        funnelStage,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
-        url: error.config?.url
-      });
-      
-      throw new Error(error.response?.data?.message || `Erro ao atualizar etapa do desafio (Status: ${error.response?.status})`);
-    }
-  },
-
-  // Carregar todos os desafios organizados por etapa do funil
-  async getAllChallengesOrganized(): Promise<Record<string, Challenge[]>> {
-    console.log('🔍 Iniciando carregamento de desafios...');
-    
-    // Tenta primeiro buscar todos de uma vez (mais rápido)
-    try {
-      console.log('📥 Tentando buscar todos os desafios de uma vez...');
-      const allChallenges = await this.getChallenges(0, 100);
-      
-      if (allChallenges.length > 0) {
-        console.log(`✅ ${allChallenges.length} desafios carregados com sucesso!`);
-        return organizeChallengesByFunnelStage(allChallenges);
-      }
-    } catch (error: any) {
-      console.warn('⚠️ Método principal falhou. Usando método alternativo (busca por etapa)...');
-    }
-    
-    // Fallback: busca por etapa individualmente
-    const results: Record<string, Challenge[]> = {
-      ideacao: [],
-      pretriagem: [],
-      colaboracao: [],
-      avaliacao: [],
-      experimentacao: [],
-    };
-
-    const funnelStages = Object.entries(COLUMN_TO_FUNNEL_STAGE);
-    
-    // Busca cada etapa individualmente
-    const promises = funnelStages.map(async ([columnKey, funnelStage]) => {
-      try {
-        console.log(`🔎 Buscando ${funnelStage}...`);
-        const challenges = await this.getChallengesByFunnelStage(funnelStage);
-        console.log(`✅ ${challenges.length} desafios em ${funnelStage}`);
-        results[columnKey] = challenges;
-      } catch (err) {
-        console.error(`❌ Erro ao carregar ${funnelStage}`);
-        results[columnKey] = [];
-      }
+  try {
+    await api.put(`/internal/challenges/${id}/status`, {}, {  
+      params: { funnelStage },
+      headers: { 'Content-Type': 'application/json' },      
     });
+  } catch (error: any) {
+    console.error('❌ Erro ao atualizar etapa do desafio:', {
+      id,
+      funnelStage,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      message: error.message,
+      url: error.config?.url
+    });
+    throw new Error(error.response?.data?.message || 'Erro ao atualizar etapa do desafio');
+  }
+},
 
-    await Promise.allSettled(promises);
-    
-    const totalChallenges = Object.values(results).reduce((sum, arr) => sum + arr.length, 0);
-    console.log(`✅ Carregamento concluído! Total: ${totalChallenges} desafios`);
+  // Buscar todos os desafios organizados por etapa
+  async getAllChallengesOrganized(): Promise<Record<string, Challenge[]>> {
+    try {
+      const allChallenges = await this.getChallenges(1, 100);
+      return organizeChallengesByFunnelStage(allChallenges);
+    } catch (error: any) {
+      console.warn('Falha ao buscar todos os desafios de uma vez, tentando por etapa...');
+      const results: Record<string, Challenge[]> = {
+        idea_generation: [],
+        pre_screening: [],
+        ideation: [],
+        detailed_screening: [],
+        experimentation: [],
+      };
 
-    return results;
+      const funnelStages = Object.entries(COLUMN_TO_FUNNEL_STAGE);
+
+      await Promise.allSettled(
+        funnelStages.map(async ([columnKey, funnelStage]) => {
+          const challenges = await this.getChallengesByFunnelStage(funnelStage);
+          results[columnKey] = challenges;
+        })
+      );
+
+      return results;
+    }
   },
 };
