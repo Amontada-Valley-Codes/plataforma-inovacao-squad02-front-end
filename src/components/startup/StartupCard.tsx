@@ -54,7 +54,7 @@ export default function StartupCard({
 
   
 
-    // Cor do estágio baseado no status
+   
     const getStageColor = (stage: string) => {
         const stageLower = stage.toLowerCase();
         if (stageLower.includes('seed') || stageLower.includes('inicial') || stageLower.includes('early')) {
@@ -71,7 +71,7 @@ export default function StartupCard({
     return (
         <>
             <div className="px-4 py-6 max-w-[400px] rounded-2xl border-2 border-orange-200 bg-white dark:bg-gray-900 hover:shadow-lg transition-all duration-300 cursor-pointer">
-                {/* Header */}
+                
                 <div className="flex justify-between items-center">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
@@ -86,35 +86,35 @@ export default function StartupCard({
                     </div>
                 </div>
                 
-                {/* Pitch/Descrição */}
+                
                 <div className="mt-5">
                     <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed line-clamp-2">
                         {pitch}
                     </p>
                 </div>
 
-                {/* Informações principais */}
+               
                 <div className="mt-4 space-y-3">
-                    {/* Localização */}
+                 
                     <div className="flex gap-2 items-center text-gray-700 dark:text-gray-300 bg-orange-50 dark:bg-gray-800 px-3 py-2 rounded-lg border border-orange-100 dark:border-gray-700">
                         <MapPin size={18} className="text-orange-600" />
                         <p className="text-sm font-medium">{location}</p>
                     </div>
 
-                    {/* Data de criação */}
+              
                     <div className="flex gap-2 items-center text-gray-700 dark:text-gray-300 bg-orange-50 dark:bg-gray-800 px-3 py-2 rounded-lg border border-orange-100 dark:border-gray-700">
                         <CalendarClock size={18} className="text-orange-600" />
                         <p className="text-sm font-medium">Criado em {formatDate(createdAt)}</p>
                     </div>
 
-                    {/* Segmento principal */}
+                   
                     <div className="flex gap-2 items-center text-gray-700 dark:text-gray-300 bg-orange-50 dark:bg-gray-800 px-3 py-2 rounded-lg border border-orange-100 dark:border-gray-700">
                         <Puzzle size={18} className="text-orange-600" />
                         <p className="text-sm font-medium">{segment[0] || "Startup"}</p>
                     </div>
                 </div>
 
-                {/* Footer */}
+                
                 <div className="flex justify-between items-center mt-4">
                     <Button 
                         onClick={openDetalhes} 
@@ -127,7 +127,7 @@ export default function StartupCard({
                 </div>
             </div>
             
-            {/* Modal de Detalhes - Similar ao DetalhesDesafio */}
+      
             <StartupDetalhes
                 startup={{ 
                     id, name, cnpj, segment, technologies, stage, 
@@ -143,7 +143,7 @@ export default function StartupCard({
     );
 }
 
-// Componente Modal de Detalhes (similar ao DetalhesDesafio)
+
 interface StartupDetalhesProps {
     startup: StartupCardProps;
     isOpen: boolean;
@@ -181,7 +181,7 @@ function StartupDetalhes({ startup, isOpen, onClose, isAdmin, onEdit, onDelete }
     return (
         <div className="fixed inset-0 bg-black/50 dark:bg-gray-800/20 z-[2000] backdrop-blur-sm flex items-center justify-center p-4">
             <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden border-2 border-orange-200">
-                {/* Header */}
+              
                 <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                     <div className="flex justify-between items-center">
                         <div className="flex items-center gap-3">
@@ -194,7 +194,7 @@ function StartupDetalhes({ startup, isOpen, onClose, isAdmin, onEdit, onDelete }
                             </span>
                             {isAdmin && (
                                 <div className="flex gap-2">
-                                    {/* Usando variant outline ou sem variant para botões secundários */}
+                             
                                     <Button 
                                         size="sm" 
                                         variant="outline" 
@@ -218,24 +218,24 @@ function StartupDetalhes({ startup, isOpen, onClose, isAdmin, onEdit, onDelete }
                     <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">CNPJ: {startup.cnpj}</p>
                 </div>
 
-                {/* Content */}
+           
                 <div className="p-6 overflow-y-auto max-h-[70vh]">
                     <div className="space-y-6">
-                        {/* Pitch */}
+                      
                         <div>
                             <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3">Pitch</h3>
                             <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{startup.pitch}</p>
                         </div>
 
-                        {/* Problema */}
+                   
                         <div>
                             <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3">Problema que Resolve</h3>
                             <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{startup.problems}</p>
                         </div>
 
-                        {/* Informações Grid */}
+                     
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {/* Localização */}
+                            
                             <div className="flex items-center gap-3 p-3 bg-orange-50 dark:bg-gray-800 rounded-lg">
                                 <MapPin className="w-5 h-5 text-orange-600" />
                                 <div>

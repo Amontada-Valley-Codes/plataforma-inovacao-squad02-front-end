@@ -3,7 +3,7 @@ import { jwtDecode } from "jwt-decode";
 interface TokenPayload {
   id: string;
   email: string;
-  role: "ADMIN" | "COMMON" | "EVALUATOR" | "MANAGER"; 
+  role: "ADMIN" | "COMMON" | "EVALUATOR" | "MANAGER" | 'STARTUP'; 
 }
 
 export function getUserRole(): TokenPayload["role"] | null {
