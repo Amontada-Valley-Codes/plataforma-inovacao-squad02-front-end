@@ -184,6 +184,32 @@ export default function Page() {
             </div>
 
             <div>
+              <Label >Email</Label>
+              <Input
+              id="Email"
+              type="text"
+              placeholder="Digite seu Email"
+              {...register("userEmail")}
+              />
+              {errors.userEmail &&(
+                <span className="text-red-600">{errors.userEmail.message}</span>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="tel">Digite seu Telefone</Label>
+              <Input
+              type="text"
+              id="tel"
+              placeholder="+5511999998888"
+              {...register("userPhone")}
+              />
+              {errors.userPhone &&(
+                <span className="text-red-600">{errors.userPhone.message}</span>
+              )}
+            </div>
+
+            <div>
               <Label htmlFor="cnpj">CNPJ</Label>
               <Input
                 id="cnpj"

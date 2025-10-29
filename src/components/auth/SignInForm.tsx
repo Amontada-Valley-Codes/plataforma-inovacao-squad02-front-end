@@ -67,7 +67,7 @@ export default function SignInForm() {
     } else if (role === "EVALUATOR") {
       router.push("/deshboard");
     } else if (role === "STARTUP") {
-      router.push("/page-startup");
+      router.push("/page-desafios");
     } else {
       router.push("/deshboard");
     }

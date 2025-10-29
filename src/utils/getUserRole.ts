@@ -7,7 +7,7 @@ interface TokenPayload {
 }
 
 export function getUserRole(): TokenPayload["role"] | null {
-  if (typeof window === "undefined") return null; // segurança SSR
+  if (typeof window === "undefined") return null; 
   const token = localStorage.getItem("token");
   if (!token) return null;
 
