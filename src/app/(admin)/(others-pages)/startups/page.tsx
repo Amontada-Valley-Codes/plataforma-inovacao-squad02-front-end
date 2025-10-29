@@ -1,12 +1,4 @@
 "use client";
-
-// React imports
-import { useEffect } from "react";
-
-// External libraries
-import Swal from "sweetalert2";
-
-// Internal components
 import ComponentCard from "@/components/common/ComponentCard";
 import { Modal } from "@/components/ui/modal";
 import Button from "@/components/ui/button/Button";
@@ -22,7 +14,6 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
-// Hooks and services
 import { useModal } from "@/hooks/useModal";
 import { useStartupForm } from "@/hooks/useStartupForm";
 import { useStartups } from "@/hooks/useStartups";
@@ -63,7 +54,7 @@ export default function Page() {
 
   return (
     <div>
-      {/* Header */}
+      
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">Cadastro da Startup</h1>
         <Button onClick={openModal} size="sm" variant="primary">
@@ -71,23 +62,23 @@ export default function Page() {
         </Button>
       </div>
 
-      {/* Main Content */}
+     
       <div className="px-6 pb-8">
-        {/* Error Messages */}
+     
         {(error || formError) && (
           <div className="mb-6 bg-red-100 border border-red-400 text-red-500 px-4 py-3 rounded">
             {error || formError}
           </div>
         )}
 
-        {/* Loading State */}
+      
         {loading ? (
           <div className="flex justify-center items-center py-16">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
           </div>
         ) : (
           <>
-            {/* Empty State */}
+         
             {startups.length === 0 ? (
               <div className="text-center py-16 bg-white rounded-2xl shadow-md border-2 border-dashed border-orange-200">
                 <div className="w-16 h-16 mx-auto bg-orange-100 rounded-full flex items-center justify-center mb-4">
@@ -102,7 +93,7 @@ export default function Page() {
               </div>
             ) : (
               <>
-                {/* Startups Grid */}
+         
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {startups.map((startup) => (
                     <StartupCard
@@ -123,7 +114,7 @@ export default function Page() {
                   ))}
                 </div>
 
-                {/* Pagination */}
+            
                 {totalPages > 1 && (
                   <div className="mt-6 flex justify-center">
                     <Pagination>
@@ -172,11 +163,11 @@ export default function Page() {
         )}
       </div>
 
-      {/* Modal Form */}
+     
       <Modal isOpen={isOpen} onClose={closeModal}>
         <ComponentCard title="Criar nova empresa">
           <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
-            {/* Basic Information */}
+          
             <div>
               <Label htmlFor="name">Nome da Startup</Label>
               <Input
@@ -189,6 +180,32 @@ export default function Page() {
                 <span className="text-red-600 text-sm">
                   {errors.name.message}
                 </span>
+              )}
+            </div>
+
+            <div>
+              <Label >Email</Label>
+              <Input
+              id="Email"
+              type="text"
+              placeholder="Digite seu Email"
+              {...register("userEmail")}
+              />
+              {errors.userEmail &&(
+                <span className="text-red-600">{errors.userEmail.message}</span>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="tel">Digite seu Telefone</Label>
+              <Input
+              type="text"
+              id="tel"
+              placeholder="+5511999998888"
+              {...register("userPhone")}
+              />
+              {errors.userPhone &&(
+                <span className="text-red-600">{errors.userPhone.message}</span>
               )}
             </div>
 
@@ -207,7 +224,7 @@ export default function Page() {
               )}
             </div>
 
-            {/* Technologies Selection */}
+           
             <div>
               <Label>Tecnologias</Label>
               <div className="flex flex-wrap gap-3 mt-2">
@@ -233,7 +250,7 @@ export default function Page() {
               )}
             </div>
 
-            {/* Segments Selection */}
+         
             <div>
               <Label>Seguimentos</Label>
               <div className="flex flex-wrap gap-3 mt-2">
@@ -259,7 +276,7 @@ export default function Page() {
               )}
             </div>
 
-            {/* Stage Selection */}
+        
             <div>
               <Label htmlFor="stage">Estágio</Label>
               <select
@@ -280,7 +297,7 @@ export default function Page() {
               )}
             </div>
 
-            {/* Business Information */}
+          
             <div>
               <Label htmlFor="problems">Problema</Label>
               <Input
@@ -311,7 +328,7 @@ export default function Page() {
               )}
             </div>
 
-            {/* Founders */}
+          
             <div>
               <Label>Fundadores</Label>
               {founderFields.map((field, index) => (
@@ -347,7 +364,7 @@ export default function Page() {
               </button>
             </div>
 
-            {/* Pitch */}
+           
             <div>
               <Label htmlFor="pitch">Pitch</Label>
               <Input
@@ -363,7 +380,7 @@ export default function Page() {
               )}
             </div>
 
-            {/* Links */}
+           
             <div>
               <Label>Links</Label>
               {linkFields.map((field, index) => (
@@ -399,7 +416,7 @@ export default function Page() {
               </button>
             </div>
 
-            {/* Form Actions */}
+          
             <div className="flex justify-end gap-3 pt-4">
               <Button onClick={closeModal} disabled={isSubmitting}>
                 Cancelar

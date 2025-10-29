@@ -46,17 +46,31 @@ export const useStartupForm = (onSuccess: () => void) => {
     setError(null);
 
     try {
-      await api.post("/startup", data);
+      const response = await api.post("/startup/create/user", data);
+      const { newStartup,usaerStartup } = response.data;
+
       reset({
         founders: [""],
         links: [""],
       });
       onSuccess();
+
       Swal.fire({
         title: "Sucesso!",
         icon: "success",
         text: "Startup cadastrada com sucesso!",
       });
+
+     
+      const message = `
+Olá! 🎉 Sua startup *${newStartup.name}* foi cadastrada com sucesso na plataforma! 🚀
+Acesse o link para finalizar o cadastro.
+${usaerStartup.inviteLink}
+`;
+      const phone = data.userPhone.replace(/\D/g, "");
+      const whatsappLink = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+      window.open(whatsappLink, "_blank");
+      console.log(response.data)
     } catch (err) {
       console.error("Erro ao cadastrar startup:", err);
       setError("Erro ao cadastrar startup. Tente novamente.");
