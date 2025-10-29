@@ -22,9 +22,8 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination"
+} from "@/components/ui/pagination";
 import Swal from "sweetalert2";
-
 
 const formSchema = z
   .object({
@@ -117,8 +116,8 @@ export default function Page() {
         icon: "success",
         confirmButtonText: "OK",
         customClass: {
-          container: "z-[9999]"
-        }
+          container: "z-[9999]",
+        },
       });
       console.log("Desafio cadastrado:", response.data);
       setDesafios((prev) => [...prev, response.data]);
@@ -140,27 +139,30 @@ export default function Page() {
     };
 
     try {
-      const response = await api.put(`/internal/challenges/${editingDesafio.id}`, payload);
+      const response = await api.put(
+        `/internal/challenges/${editingDesafio.id}`,
+        payload
+      );
       Swal.fire({
         title: "Sucesso!",
         text: "Desafio atualizado com sucesso.",
         icon: "success",
         confirmButtonText: "OK",
         customClass: {
-          container: "z-[9999]"
-        }
+          container: "z-[9999]",
+        },
       });
       console.log("Desafio atualizado:", response.data);
       // Atualiza a lista localmente
-      setDesafios(prev =>
-        prev.map(desafio =>
+      setDesafios((prev) =>
+        prev.map((desafio) =>
           desafio.id === editingDesafio.id ? response.data : desafio
         )
       );
       setEditModalOpen(false); // fecha o modal de edição
       setEditingDesafio(null);
       editReset(); // reseta o formulário de edição
-      closeModal()
+      closeModal();
     } catch (error) {
       console.error("Erro ao atualizar", error);
       setError("Erro ao atualizar desafio. Tente novamente.");
@@ -178,8 +180,8 @@ export default function Page() {
       confirmButtonText: "Sim, excluir",
       cancelButtonText: "Cancelar",
       customClass: {
-        container: "z-[9999] "
-      }
+        container: "z-[9999] ",
+      },
     });
 
     if (!result.isConfirmed) {
@@ -189,7 +191,7 @@ export default function Page() {
     try {
       await api.delete(`/internal/challenges/${id}`);
       // Remove da lista localmente
-      setDesafios(prev => prev.filter(desafio => desafio.id !== id));
+      setDesafios((prev) => prev.filter((desafio) => desafio.id !== id));
     } catch (error) {
       console.error("Erro ao excluir", error);
       setError("Erro ao excluir desafio. Tente novamente.");
@@ -200,8 +202,8 @@ export default function Page() {
         icon: "success",
         confirmButtonText: "OK",
         customClass: {
-          container: "z-[9999]"
-        }
+          container: "z-[9999]",
+        },
       });
       closeModal();
     }
@@ -235,8 +237,12 @@ export default function Page() {
           },
         });
         const desafios = response.data.challenges;
-        setDesafios(desafios)
-        setTotalPages(Math.ceil(response.data.pagination.total / response.data.pagination.limit));
+        setDesafios(desafios);
+        setTotalPages(
+          Math.ceil(
+            response.data.pagination.total / response.data.pagination.limit
+          )
+        );
       } catch (error) {
         console.error("Erro ao buscar desafios", error);
         setError("Erro ao carregar desafios.");
@@ -260,10 +266,10 @@ export default function Page() {
       <div className="px-3 py-5 rounded-2xl">
         <div className="flex justify-between items-center">
           <p className="text-2xl">Desafios</p>
-            <Button onClick={openModal} size="sm" variant="primary">
-              <Lightbulb size={20} />
-              Criar Desafio
-            </Button>
+          <Button onClick={openModal} size="sm" variant="primary">
+            <Lightbulb size={20} />
+            Criar Desafio
+          </Button>
         </div>
       </div>
 
@@ -278,7 +284,9 @@ export default function Page() {
             <h3 className="text-xl font-semibold text-gray-600 dark:text-gray-300 mb-2">
               Nenhum desafio criado ainda
             </h3>
-            <p className="text-gray-500 dark:text-gray-300">Comece criando seu primeiro desafio!</p>
+            <p className="text-gray-500 dark:text-gray-300">
+              Comece criando seu primeiro desafio!
+            </p>
           </div>
         ) : (
           <>
@@ -299,9 +307,19 @@ export default function Page() {
                   theme={desafio.theme}
                   visibility={desafio.visibility}
                   funnelStage={desafio.funnelStage}
-                  isAdmin={roleState === 'MANAGER'}
+                  isAdmin={roleState === "MANAGER"}
                   onEdit={() => openEditModal(desafio)}
                   onDelete={() => onDelete(desafio.id)}
+                  onVisibilityChange={(newVisibility) => {
+                    // Atualiza a visibilidade localmente
+                    setDesafios((prev) =>
+                      prev.map((d) =>
+                        d.id === desafio.id
+                          ? { ...d, visibility: newVisibility }
+                          : d
+                      )
+                    );
+                  }}
                 />
               ))}
             </div>
@@ -312,7 +330,9 @@ export default function Page() {
                   <PaginationItem>
                     <PaginationPrevious
                       href="#"
-                      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                      }
                       aria-disabled={currentPage === 1}
                     />
                   </PaginationItem>
@@ -330,7 +350,9 @@ export default function Page() {
                   <PaginationItem>
                     <PaginationNext
                       href="#"
-                      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                      }
                       aria-disabled={currentPage === totalPages}
                     />
                   </PaginationItem>
@@ -375,7 +397,9 @@ export default function Page() {
                     )}
                   />
                   {errors.startDate && (
-                    <span className="text-red-600">{errors.startDate.message}</span>
+                    <span className="text-red-600">
+                      {errors.startDate.message}
+                    </span>
                   )}
                 </div>
 
@@ -394,7 +418,9 @@ export default function Page() {
                     )}
                   />
                   {errors.endDate && (
-                    <span className="text-red-600">{errors.endDate.message}</span>
+                    <span className="text-red-600">
+                      {errors.endDate.message}
+                    </span>
                   )}
                 </div>
 
@@ -432,7 +458,6 @@ export default function Page() {
                   )}
                 </div>
 
-
                 <Button className="w-full mt-2" size="sm">
                   Criar Desafio
                 </Button>
@@ -457,7 +482,9 @@ export default function Page() {
                     {...editRegister("name")}
                   />
                   {editErrors.name && (
-                    <span className="text-red-600">{editErrors.name.message}</span>
+                    <span className="text-red-600">
+                      {editErrors.name.message}
+                    </span>
                   )}
                 </div>
 
@@ -476,7 +503,9 @@ export default function Page() {
                     )}
                   />
                   {editErrors.startDate && (
-                    <span className="text-red-600">{editErrors.startDate.message}</span>
+                    <span className="text-red-600">
+                      {editErrors.startDate.message}
+                    </span>
                   )}
                 </div>
 
@@ -495,7 +524,9 @@ export default function Page() {
                     )}
                   />
                   {editErrors.endDate && (
-                    <span className="text-red-600">{editErrors.endDate.message}</span>
+                    <span className="text-red-600">
+                      {editErrors.endDate.message}
+                    </span>
                   )}
                 </div>
 
@@ -507,7 +538,9 @@ export default function Page() {
                     {...editRegister("theme")}
                   />
                   {editErrors.theme && (
-                    <span className="text-red-600">{editErrors.theme.message}</span>
+                    <span className="text-red-600">
+                      {editErrors.theme.message}
+                    </span>
                   )}
                 </div>
 

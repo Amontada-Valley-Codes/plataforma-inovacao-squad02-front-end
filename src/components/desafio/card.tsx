@@ -17,6 +17,7 @@ type cardProps = {
     isAdmin?: boolean;
     onEdit?: () => void;
     onDelete?: () => void;
+    onVisibilityChange?: (newVisibility: 'PUBLIC' | 'INTERNAL') => void;
 };
 
 export default function Card({ 
@@ -31,7 +32,8 @@ export default function Card({
     funnelStage,
     isAdmin = false,
     onEdit,
-    onDelete 
+    onDelete ,
+    onVisibilityChange
 }: cardProps) {
     const [isOpen, setIsOpen] = useState(false);
 
@@ -96,6 +98,7 @@ export default function Card({
                 isAdmin={isAdmin}
                 onEdit={onEdit}
                 onDelete={onDelete}
+                onVisibilityChange={onVisibilityChange} 
             />
         </>
     );
