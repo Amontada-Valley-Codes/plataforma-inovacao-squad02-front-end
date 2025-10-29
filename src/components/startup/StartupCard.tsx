@@ -42,15 +42,17 @@ export default function StartupCard({
     const openDetalhes = () => setIsOpen(true);
     const closeDetalhes = () => setIsOpen(false);
 
-    // Formatar data
     const formatDate = (dateString: string) => {
-        try {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('pt-BR');
-        } catch {
-            return "Data inválida";
-        }
-    };
+     try {
+        const date = new Date(dateString);
+     return date.toLocaleDateString('pt-BR');
+  } catch {
+    return "Data inválida";
+  }
+};
+
+
+  
 
     // Cor do estágio baseado no status
     const getStageColor = (stage: string) => {
@@ -102,7 +104,7 @@ export default function StartupCard({
                     {/* Data de criação */}
                     <div className="flex gap-2 items-center text-gray-700 dark:text-gray-300 bg-orange-50 dark:bg-gray-800 px-3 py-2 rounded-lg border border-orange-100 dark:border-gray-700">
                         <CalendarClock size={18} className="text-orange-600" />
-                        <p className="text-sm font-medium">Criado em {createdAt}</p>
+                        <p className="text-sm font-medium">Criado em {formatDate(createdAt)}</p>
                     </div>
 
                     {/* Segmento principal */}
@@ -114,9 +116,6 @@ export default function StartupCard({
 
                 {/* Footer */}
                 <div className="flex justify-between items-center mt-4">
-                    <p className="px-3 py-1 rounded-full text-white text-sm font-semibold bg-gradient-to-r from-blue-500 to-blue-600">
-                        {technologies.length} techs
-                    </p>
                     <Button 
                         onClick={openDetalhes} 
                         size="sm" 
