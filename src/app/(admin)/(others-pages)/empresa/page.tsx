@@ -70,7 +70,7 @@ export default function Page() {
           },
         });
         
-        // Formato da API: { data: [...], meta: { total, page, limit, totalPages } }
+        
         if (res.data.data && res.data.meta) {
           setEmpresas(res.data.data);
           setTotalPages(res.data.meta.totalPages);
