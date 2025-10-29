@@ -1,5 +1,5 @@
 import { FaHeart } from "react-icons/fa";
-import { MessageSquareText, PlusCircle } from 'lucide-react';
+import { MessageSquareText, PlusCircle, User } from 'lucide-react';
 import { IdeiaType } from "@/types/ideia";
 import { useState, useEffect } from "react";
 import CommentList from "./commentList";
@@ -7,6 +7,7 @@ import api from "@/services/axiosServices";
 import { CommentType } from "@/types/comment";
 import { set } from "zod";
 import CommentForm from "./CommentForm";
+import Image from "next/image";
 
 
 type Props = {
@@ -77,7 +78,19 @@ export default function Ideia({ Ideia, funnelStage }: Props) {
     return (
         <div className="bg-white dark:bg-gray-900 rounded-lg shadow p-4 border border-gray-150 dark:border-gray-900">
             <div className="flex items-center mb-2">
-                <img src={"../images/user/user-01.jpg"} alt={Ideia.author.name} className="h-10 w-10 rounded-full mr-3 border-2 border-gray-300" />
+                {Ideia.author?.pictures?.url ? (
+                <Image
+                    src={Ideia.author.pictures.url}
+                    alt={Ideia.author.name}
+                    width={40}
+                    height={40}
+                    className="rounded-full mr-3 border-2 border-gray-300 object-cover"
+                />
+                ) : (
+                <div className="h-10 w-10 mr-3 flex items-center justify-center rounded-full border-2 border-gray-300 bg-gray-200 dark:bg-gray-800">
+                    <User className="text-gray-600 dark:text-gray-300" size={20} />
+                </div>
+                )}
                 <div>
                     <p className="font-semibold text-gray-900 dark:text-gray-100">{Ideia.author.name}</p>
                     <p className="text-gray-700 dark:text-gray-200">{Ideia.title}</p>

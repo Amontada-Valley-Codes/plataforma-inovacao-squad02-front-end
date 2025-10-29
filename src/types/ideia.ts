@@ -16,6 +16,10 @@ export type IdeiaType = {
         role: string;
         createdAt: string;
         updatedAt: string;
+        pictures: {
+            url: string;
+            public_id: string;
+        }
     };
 }
 type CommentType = {

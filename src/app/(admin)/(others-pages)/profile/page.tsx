@@ -9,6 +9,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import Swal from "sweetalert2";
+import Image from "next/image";
+
 
 const profileSchema = z.object({
   name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
@@ -346,10 +348,12 @@ export default function ProfilePage() {
               <div className="relative">
                 <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-lg overflow-hidden border-4 border-white/30">
                   {imagePreview ? (
-                    <img
+                    <Image
                       src={imagePreview}
                       alt="Foto de perfil"
                       className="w-full h-full object-cover"
+                      width={96}
+                      height={96}
                       onError={(e) => {
                         console.error("Erro ao carregar imagem:", imagePreview);
                         e.currentTarget.style.display = 'none';
@@ -386,7 +390,7 @@ export default function ProfilePage() {
             {!isEditing && (
               <Button
                 onClick={handleEdit}
-                className="bg-white hover:bg-orange-50 dark:bg-gray-800 text-orange-600 dark:text-orange-400 dark:hover:bg-gray-700 mt-4 sm:mt-0 w-full sm:w-auto justify-center"
+                className="bg-orange-600 hover:bg-orange-500 dark:bg-gray-800 text-orange-600 dark:text-orange-400 dark:hover:bg-gray-700 mt-4 sm:mt-0 w-full sm:w-auto justify-center"
                 size="sm"
               >
                 <Edit2 size={18}/>
