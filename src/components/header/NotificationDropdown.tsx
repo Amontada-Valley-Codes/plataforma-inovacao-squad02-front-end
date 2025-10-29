@@ -5,7 +5,6 @@ import { Bell, Check, X } from "lucide-react";
 import api from "@/services/axiosServices";
 import { toast } from "sonner";
 
-
 interface ConnectionRequest {
   id: string;
   startupName: string;
@@ -16,9 +15,14 @@ export default function NotificationDropdown() {
   const [open, setOpen] = useState(false);
   const [requests, setRequests] = useState<ConnectionRequest[]>([]);
   const [loading, setLoading] = useState(false);
+  const [companyId, setCompanyId] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const companyId = localStorage.getItem("companyId"); 
+  // Carrega o companyId do localStorage apenas no cliente
+  useEffect(() => {
+    const id = localStorage.getItem("companyId");
+    setCompanyId(id);
+  }, []);
 
   const loadRequests = async () => {
     if (!companyId) return;
@@ -48,10 +52,15 @@ export default function NotificationDropdown() {
     }
   };
 
-  useEffect(() => {
-    loadRequests();
 
-    
+  useEffect(() => {
+    if (companyId) {
+      loadRequests();
+    }
+  }, [companyId]);
+
+
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setOpen(false);
