@@ -1,16 +1,17 @@
 "use client";
 
+// React imports
+import { useEffect } from "react";
+
+// External libraries
+import Swal from "sweetalert2";
+
+// Internal components
 import ComponentCard from "@/components/common/ComponentCard";
 import { Modal } from "@/components/ui/modal";
-import { useModal } from "@/hooks/useModal";
-import { useForm, useFieldArray } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "@/components/ui/button/Button";
 import Label from "@/components/form/Label";
 import Input from "@/components/form/input/InputField";
-import api from "@/services/axiosServices";
-import { useEffect, useState, useCallback } from "react";
 import StartupCard from "@/components/startup/StartupCard";
 import {
   Pagination,
@@ -20,155 +21,49 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import Swal from "sweetalert2";
 
-const formSchema = z.object({
-  name: z.string().min(3, "Digite o nome da Startup"),
-  cnpj: z.string().min(18, "CNPJ inválido"),
-  segment: z.array(z.enum(["HEALTH","EDUCATION","AGRITECH","INDUSTRY","ENERGY","MARKETING", "TRANSPORT","ENVIRONMENT","CYBERSECURITY","AI",])).min(1, "Selecione pelo menos um Seguimento"),
-  technologies: z.array(z.enum(["AI", "MOBILE", "WEB3", "BLOCKCHAIN", "IOT"])).min(1, "Selecione pelo menos uma tecnologia"),
-  stage: z.enum(["IDEATION", "OPERATION", "TRACTION", "SCALE"]),
-  problems: z.string().min(5, "Descreva melhor o problema"),
-  location: z.string().min(2, "Digite uma localização válida"),
-  founders: z.array(z.string().min(1, "Nome do fundador é obrigatório")),
-  pitch: z.string().min(5, "Descreva melhor o pitch"),
-  links: z.array(z.string().min(1, "Link é obrigatório")),
-});
+// Hooks and services
+import { useModal } from "@/hooks/useModal";
+import { useStartupForm } from "@/hooks/useStartupForm";
+import { useStartups } from "@/hooks/useStartups";
 
-type FormData = z.infer<typeof formSchema>;
-
-type StartupResponse = {
-  data: Startup[];
-  total: number;
-  page: number;
-  limit: number;
-};
-
-type Startup = FormData & {
-  id: string;
-  createdAt: string;
-};
-
-const TECHNOLOGIES = [
-  { value: "AI", label: "Inteligência Artificial" },
-  { value: "MOBILE", label: "Aplicativos Mobile" },
-  { value: "WEB3", label: "Desenvolvimento Web" },
-  { value: "BLOCKCHAIN", label: "Blockchain" },
-  { value: "IOT", label: "Internet das Coisas" },
-];
-
-const SEGMENTS = [
-  { value: "HEALTH", label: "Saúde" },
-  { value: "EDUCATION", label: "Educação" },
-  { value: "AGRITECH", label: "Agrotecnologia" },
-  { value: "INDUSTRY", label: "Indústria" },
-  { value: "ENERGY", label: "Energia" },
-  { value: "MARKETING", label: "Marketing" },
-  { value: "TRANSPORT", label: "Transporte" },
-  { value: "ENVIRONMENT", label: "Meio Ambiente" },
-  { value: "CYBERSECURITY", label: "Cibersegurança" },
-  { value: "AI", label: "Inteligência Artificial" },
-];
+import { TECHNOLOGIES, SEGMENTS } from "@/constants/startup";
 
 export default function Page() {
   const { isOpen, openModal, closeModal } = useModal();
-  const [startups, setStartups] = useState<Startup[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [totalPages, setTotalPages] = useState(1);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const {
+    startups,
+    loading,
+    error,
+    totalPages,
+    currentPage,
+    fetchStartups,
+    handlePageChange,
+  } = useStartups();
 
   const {
     register,
     handleSubmit,
     reset,
     control,
-    formState: { errors },
-  } = useForm<FormData>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      founders: [""],
-      links: [""],
-    },
+    errors,
+    linkFields,
+    appendLink,
+    removeLink,
+    founderFields,
+    appendFounder,
+    removeFounder,
+    onSubmit,
+    isSubmitting,
+    error: formError,
+  } = useStartupForm(async () => {
+    closeModal();
+    await fetchStartups();
   });
-
-  const {
-    fields: linkFields,
-    append: appendLink,
-    remove: removeLink,
-  } = useFieldArray<any>({
-    control,
-    name: "links",
-  });
-
-  const {
-    fields: founderFields,
-    append: appendFounder,
-    remove: removeFounder,
-  } = useFieldArray<any>({
-    control,
-    name: "founders",
-  });
-
-  const fetchStartups = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await api.get<StartupResponse>("/startup", {
-        params: {
-          page: currentPage,
-          limit: 9,
-        },
-      });
-      setStartups(res.data.data);
-      setTotalPages(Math.ceil(res.data.total / res.data.limit));
-    } catch (err) {
-      console.error("Erro ao buscar startups:", err);
-      setError("Erro ao carregar startups. Tente novamente.");
-    } finally {
-      setLoading(false);
-    }
-  }, [currentPage]);
-
-  useEffect(() => {
-    fetchStartups();
-  }, [fetchStartups]);
-
-  const onSubmit = async (data: FormData) => {
-    setIsSubmitting(true);
-    setError(null);
-    console.log(data);
-    try {
-      await api.post("/startup", data);
-      closeModal();
-      reset({
-        founders: [""],
-        links: [""],
-      });
-      setCurrentPage(1);
-      await fetchStartups();
-      Swal.fire({
-        title: "Sucesso!",
-        icon: "success",
-        text: "Startup cadastrada com sucesso!",
-      });
-    } catch (err) {
-      console.error("Erro ao cadastrar startup:", err);
-      setError("Erro ao cadastrar startup. Tente novamente.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
 
   return (
     <div>
+      {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">Cadastro da Startup</h1>
         <Button onClick={openModal} size="sm" variant="primary">
@@ -176,102 +71,112 @@ export default function Page() {
         </Button>
       </div>
 
+      {/* Main Content */}
       <div className="px-6 pb-8">
-        {error && (
+        {/* Error Messages */}
+        {(error || formError) && (
           <div className="mb-6 bg-red-100 border border-red-400 text-red-500 px-4 py-3 rounded">
-            {error}
+            {error || formError}
           </div>
         )}
 
+        {/* Loading State */}
         {loading ? (
           <div className="flex justify-center items-center py-16">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
           </div>
-        ) : startups.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-2xl shadow-md border-2 border-dashed border-orange-200">
-            <div className="w-16 h-16 mx-auto bg-orange-100 rounded-full flex items-center justify-center mb-4">
-              <span className="text-2xl">🏢</span>
-            </div>
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">
-              Nenhuma startup cadastrada ainda
-            </h3>
-            <p className="text-gray-500">
-              Comece criando sua primeira startup!
-            </p>
-          </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {startups.map((startup) => (
-                <StartupCard
-                  key={startup.id}
-                  id={startup.id}
-                  name={startup.name}
-                  cnpj={startup.cnpj}
-                  segment={startup.segment}
-                  technologies={startup.technologies}
-                  stage={startup.stage}
-                  problems={startup.problems}
-                  location={startup.location}
-                  founders={startup.founders}
-                  pitch={startup.pitch}
-                  links={startup.links}
-                  createdAt={new Date(startup.createdAt).toLocaleDateString(
-                    "pt-BR"
-                  )}
-                />
-              ))}
-            </div>
-
-            {totalPages > 1 && (
-              <div className="mt-6 flex justify-center">
-                <Pagination>
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handlePageChange(currentPage - 1);
-                        }}
-                        aria-disabled={currentPage === 1}
-                      />
-                    </PaginationItem>
-                    {[...Array(totalPages)].map((_, idx) => (
-                      <PaginationItem key={idx}>
-                        <PaginationLink
-                          href="#"
-                          isActive={currentPage === idx + 1}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handlePageChange(idx + 1);
-                          }}
-                        >
-                          {idx + 1}
-                        </PaginationLink>
-                      </PaginationItem>
-                    ))}
-                    <PaginationItem>
-                      <PaginationNext
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handlePageChange(currentPage + 1);
-                        }}
-                        aria-disabled={currentPage === totalPages}
-                      />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
+            {/* Empty State */}
+            {startups.length === 0 ? (
+              <div className="text-center py-16 bg-white rounded-2xl shadow-md border-2 border-dashed border-orange-200">
+                <div className="w-16 h-16 mx-auto bg-orange-100 rounded-full flex items-center justify-center mb-4">
+                  <span className="text-2xl">🏢</span>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                  Nenhuma startup cadastrada ainda
+                </h3>
+                <p className="text-gray-500">
+                  Comece criando sua primeira startup!
+                </p>
               </div>
+            ) : (
+              <>
+                {/* Startups Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {startups.map((startup) => (
+                    <StartupCard
+                      key={startup.id}
+                      id={startup.id}
+                      name={startup.name}
+                      cnpj={startup.cnpj}
+                      segment={startup.segment}
+                      technologies={startup.technologies}
+                      stage={startup.stage}
+                      problems={startup.problems}
+                      location={startup.location}
+                      founders={startup.founders}
+                      pitch={startup.pitch}
+                      links={startup.links}
+                      createdAt={startup.createdAt}
+                    />
+                  ))}
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="mt-6 flex justify-center">
+                    <Pagination>
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious
+                            href="#"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handlePageChange(currentPage - 1);
+                            }}
+                            aria-disabled={currentPage === 1}
+                          />
+                        </PaginationItem>
+                        {[...Array(totalPages)].map((_, idx) => (
+                          <PaginationItem key={idx}>
+                            <PaginationLink
+                              href="#"
+                              isActive={currentPage === idx + 1}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                handlePageChange(idx + 1);
+                              }}
+                            >
+                              {idx + 1}
+                            </PaginationLink>
+                          </PaginationItem>
+                        ))}
+                        <PaginationItem>
+                          <PaginationNext
+                            href="#"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handlePageChange(currentPage + 1);
+                            }}
+                            aria-disabled={currentPage === totalPages}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  </div>
+                )}
+              </>
             )}
           </>
         )}
       </div>
 
+      {/* Modal Form */}
       <Modal isOpen={isOpen} onClose={closeModal}>
         <ComponentCard title="Criar nova empresa">
           <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+            {/* Basic Information */}
             <div>
               <Label htmlFor="name">Nome da Startup</Label>
               <Input
@@ -302,6 +207,7 @@ export default function Page() {
               )}
             </div>
 
+            {/* Technologies Selection */}
             <div>
               <Label>Tecnologias</Label>
               <div className="flex flex-wrap gap-3 mt-2">
@@ -327,6 +233,7 @@ export default function Page() {
               )}
             </div>
 
+            {/* Segments Selection */}
             <div>
               <Label>Seguimentos</Label>
               <div className="flex flex-wrap gap-3 mt-2">
@@ -352,6 +259,7 @@ export default function Page() {
               )}
             </div>
 
+            {/* Stage Selection */}
             <div>
               <Label htmlFor="stage">Estágio</Label>
               <select
@@ -372,6 +280,7 @@ export default function Page() {
               )}
             </div>
 
+            {/* Business Information */}
             <div>
               <Label htmlFor="problems">Problema</Label>
               <Input
@@ -402,6 +311,7 @@ export default function Page() {
               )}
             </div>
 
+            {/* Founders */}
             <div>
               <Label>Fundadores</Label>
               {founderFields.map((field, index) => (
@@ -437,6 +347,7 @@ export default function Page() {
               </button>
             </div>
 
+            {/* Pitch */}
             <div>
               <Label htmlFor="pitch">Pitch</Label>
               <Input
@@ -452,6 +363,7 @@ export default function Page() {
               )}
             </div>
 
+            {/* Links */}
             <div>
               <Label>Links</Label>
               {linkFields.map((field, index) => (
@@ -487,6 +399,7 @@ export default function Page() {
               </button>
             </div>
 
+            {/* Form Actions */}
             <div className="flex justify-end gap-3 pt-4">
               <Button onClick={closeModal} disabled={isSubmitting}>
                 Cancelar

@@ -141,7 +141,7 @@ export default function Page() {
       <div className="flex justify-between">
         <p className="text-2xl">Cadastro de Empresa</p>
         <Button onClick={openModal} size="sm" variant="primary">
-          Nova Empresa
+          Adicionar Empresa
         </Button>
       </div>
 

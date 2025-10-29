@@ -22,6 +22,8 @@ type NavItem = {
 };
 
 const allNavItems: NavItem[] = [
+  { icon: <GridIcon />, name: "DashboardAdm", path: "/dashboardAdm" },
+  { icon: <GridIcon />, name: "DashboardGer", path: "/dashboardGer" },
   { icon: <GridIcon />, name: "Dashboard", path: "/deshboard" },
   { icon: <Lightbulb />, name: "Ideias", path: "/ideias" },
   { icon: <Brain />, name: "Desafio", path: "/desafio" },
@@ -49,9 +51,9 @@ const AppSidebar: React.FC = () => {
   
   const filteredNavItems = allNavItems.filter((item) => {
     if (userRole === "ADMIN") 
-      return [ "Perfil","Dashboard","Startups","Empresa"].includes(item.name);
+      return [ "Perfil","DashboardAdm","Startups","Empresa"].includes(item.name);
     if (userRole === "MANAGER")
-      return ["Usuários","Desafio","Perfil","Dashboard","Funil de inovações"].includes(item.name);
+      return ["Usuários","Desafio","Perfil","DashboardGer","Funil de inovações"].includes(item.name);
     if (userRole === "EVALUATOR")
       return ["Dashboard", "Desafio", "Startups", "Perfil","Funil de inovações"].includes(item.name);
     if (userRole === "COMMON")
