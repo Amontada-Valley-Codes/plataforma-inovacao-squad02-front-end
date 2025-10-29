@@ -49,13 +49,13 @@ export default function SignInForm() {
       email:data.email,
       password:data.password
     })
+    const {access_token, user } = response.data
+    localStorage.setItem("token", access_token);
 
     const role = getUserRole();
-    const {access_token, user } = response.data
 
 
     
-    localStorage.setItem("token", access_token);
     
     toast.success("Sucesso! Operação realizada.");
     router.push('/deshboard');
