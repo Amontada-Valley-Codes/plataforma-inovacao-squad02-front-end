@@ -111,7 +111,7 @@ export default function DetalhesDesafio({
     }
   };
 
-  
+  // Verifica se está no último estágio do funil
   const isLastStage = challenge.funnelStage.toUpperCase() === "EXPERIMENTATION";
 
   const handleToggleVisibility = async () => {
@@ -152,7 +152,6 @@ export default function DetalhesDesafio({
         }
       });
 
-      // Callback para atualizar o desafio na lista
       if (onVisibilityChange) {
         onVisibilityChange(newVisibility);
       }
@@ -169,6 +168,58 @@ export default function DetalhesDesafio({
       });
     } finally {
       setUpdatingVisibility(false);
+    }
+  };
+
+  const handleRequestConnection = async () => {
+    const result = await Swal.fire({
+      title: "Solicitar Conexão",
+      text: "Deseja manifestar interesse neste desafio?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#3b82f6",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Sim, solicitar",
+      cancelButtonText: "Cancelar",
+      customClass: {
+        container: "z-[9999]"
+      }
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
+
+    try {
+     await api.post(`/connections/request/${challenge.id}`);
+      
+      Swal.fire({
+        title: "Solicitação Enviada!",
+        text: "Sua solicitação de conexão foi enviada com sucesso. Aguarde o retorno da empresa.",
+        icon: "success",
+        confirmButtonText: "OK",
+        customClass: {
+          container: "z-[9999]"
+        }
+      });
+    } catch (error: any) {
+      console.error("Erro ao solicitar conexão", error);
+      
+      const errorMessage = error.response?.status === 400
+        ? "Você já solicitou conexão com este desafio."
+        : error.response?.status === 404
+        ? "Desafio não encontrado."
+        : "Não foi possível enviar a solicitação. Tente novamente.";
+      
+      Swal.fire({
+        title: "Erro!",
+        text: errorMessage,
+        icon: "error",
+        confirmButtonText: "OK",
+        customClass: {
+          container: "z-[9999]"
+        }
+      });
     }
   };
 
@@ -221,11 +272,11 @@ export default function DetalhesDesafio({
 
           {role === "STARTUP" && (
             <Button
-              onClick={() => console.log("Enviar convite")}
+              onClick={handleRequestConnection}
               size="sm"
               className="bg-blue-500 hover:bg-blue-600 text-white"
             >
-              ✉️ Convidar
+              ✉️ Solicitar Conexão
             </Button>
           )}
         </div>
