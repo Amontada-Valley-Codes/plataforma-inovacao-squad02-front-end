@@ -3,7 +3,7 @@
 import { ApexOptions } from "apexcharts";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { useRouter } from "next/navigation";
 import api from "@/services/axiosServices";
 
 const HIGHLIGHT_COLOR = "#fb6514";
@@ -11,8 +11,6 @@ const HIGHLIGHT_COLOR = "#fb6514";
 const ReactApexChart = dynamic(() => import("react-apexcharts"), {
   ssr: false,
 });
-
-
 
 interface MonthlyData {
   month: number;
@@ -28,6 +26,7 @@ interface TimelineResponse {
 
 export default function FunnelCategory() {
   const currentYear = new Date().getFullYear();
+  const router = useRouter();
 
   const [series, setSeries] = useState([
     { name: "Desafios Lançados", data: Array(12).fill(0) },
@@ -41,30 +40,37 @@ export default function FunnelCategory() {
         setLoading(true);
         setError(null);
 
+        const token = localStorage.getItem("token");
+        if (!token) {
+          throw new Error("Token ausente. Faça login para carregar os dados.");
+        }
+
         const res = await api.get<TimelineResponse>(
           `/dashboard/challenges/timeline?year=${currentYear}`
         );
 
         const { monthly } = res.data;
-
         const sorted = [...monthly].sort((a, b) => a.month - b.month);
-
         const monthlyTotals = sorted.map((m) => m.totalChallenges);
 
         setSeries([{ name: "Desafios Lançados", data: monthlyTotals }]);
-
-        console.log("Dados carregados do backend:", res.data);
       } catch (err: any) {
-        console.error("Erro ao buscar timeline:", err);
-        setError("Erro ao carregar dados do gráfico.");
+        if (err.response?.status === 401) {
+          localStorage.removeItem("token");
+          setError("Sessão expirada. Faça login novamente.");
+          setTimeout(() => router.push("/login"), 2000);
+        } else if (err.response?.status === 500) {
+          setError("Erro interno no servidor. Tente novamente mais tarde.");
+        } else {
+          setError(err.message || "Erro ao carregar dados do gráfico.");
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchTimeline();
-  }, [currentYear]);
-
+  }, [currentYear, router]);
 
   const options: ApexOptions = {
     colors: [HIGHLIGHT_COLOR],
@@ -126,13 +132,12 @@ export default function FunnelCategory() {
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border-1 border-l-4 border-[#fb6514] bg-white px-5 pt-5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:pt-6">
+    <div className="overflow-hidden rounded-2xl border-1 border-l-4 border-[#fb6514] bg-white px-5 pt-5 dark:[#fb6514] dark:bg-white/[0.03] sm:px-6 sm:pt-6">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
           Desafios Lançados ({currentYear})
         </h3>
       </div>
-
       <div className="max-w-full overflow-x-auto custom-scrollbar">
         <div className="-ml-5 min-w-[650px] xl:min-w-full pl-2">
           <ReactApexChart
