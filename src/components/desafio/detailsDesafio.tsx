@@ -17,6 +17,7 @@ import { ThemeContext } from "@/context/ThemeContext";
 import { ChallengeType } from "@/types/challenge";
 import Button from "@/components/ui/button/Button";
 import { getUserRole } from "@/utils/getUserRole";
+import Swal from "sweetalert2";
 
 type Props = {
   challenge: ChallengeType;
@@ -25,6 +26,7 @@ type Props = {
   isAdmin?: boolean;
   onEdit?: () => void;
   onDelete?: () => void;
+  onVisibilityChange?: (newVisibility: "PUBLIC" | "INTERNAL") => void;
 };
 
 export default function DetalhesDesafio({
@@ -34,6 +36,7 @@ export default function DetalhesDesafio({
   isAdmin = false,
   onEdit,
   onDelete,
+  onVisibilityChange,
 }: Props) {
   const themeContext = useContext(ThemeContext);
   if (!themeContext) {
@@ -41,6 +44,7 @@ export default function DetalhesDesafio({
   }
   const { theme: currentTheme } = themeContext;
   const [ideias, setIdeias] = useState<IdeiaType[]>([]);
+  const [updatingVisibility, setUpdatingVisibility] = useState(false);
 
   const statusTraduzido: Record<string, string> = {
     active: "Ativo",
@@ -107,6 +111,118 @@ export default function DetalhesDesafio({
     }
   };
 
+  // Verifica se está no último estágio do funil
+  const isLastStage = challenge.funnelStage.toUpperCase() === "EXPERIMENTATION";
+
+  const handleToggleVisibility = async () => {
+    const newVisibility = challenge.visibility === "PUBLIC" ? "INTERNAL" : "PUBLIC";
+    
+    const result = await Swal.fire({
+      title: "Alterar Visibilidade",
+      text: `Deseja tornar este desafio ${newVisibility === "PUBLIC" ? "público" : "privado"}?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#fb6514",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Sim, alterar",
+      cancelButtonText: "Cancelar",
+      customClass: {
+        container: "z-[9999]"
+      }
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
+
+    setUpdatingVisibility(true);
+    try {
+      const response = await api.patch(
+        `/internal/challenges/${challenge.id}/visibility`,
+        { visibility: newVisibility }
+      );
+      
+      Swal.fire({
+        title: "Sucesso!",
+        text: `Visibilidade alterada para ${newVisibility === "PUBLIC" ? "público" : "privado"}.`,
+        icon: "success",
+        confirmButtonText: "OK",
+        customClass: {
+          container: "z-[9999]"
+        }
+      });
+
+      if (onVisibilityChange) {
+        onVisibilityChange(newVisibility);
+      }
+    } catch (error) {
+      console.error("Erro ao atualizar visibilidade", error);
+      Swal.fire({
+        title: "Erro!",
+        text: "Não foi possível alterar a visibilidade. Tente novamente.",
+        icon: "error",
+        confirmButtonText: "OK",
+        customClass: {
+          container: "z-[9999]"
+        }
+      });
+    } finally {
+      setUpdatingVisibility(false);
+    }
+  };
+
+  const handleRequestConnection = async () => {
+    const result = await Swal.fire({
+      title: "Solicitar Conexão",
+      text: "Deseja manifestar interesse neste desafio?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#3b82f6",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Sim, solicitar",
+      cancelButtonText: "Cancelar",
+      customClass: {
+        container: "z-[9999]"
+      }
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
+
+    try {
+      await api.post(`/connections/request/${challenge.id}`);
+      
+      Swal.fire({
+        title: "Solicitação Enviada!",
+        text: "Sua solicitação de conexão foi enviada com sucesso. Aguarde o retorno da empresa.",
+        icon: "success",
+        confirmButtonText: "OK",
+        customClass: {
+          container: "z-[9999]"
+        }
+      });
+    } catch (error: any) {
+      console.error("Erro ao solicitar conexão", error);
+      
+      const errorMessage = error.response?.status === 400
+        ? "Você já solicitou conexão com este desafio."
+        : error.response?.status === 404
+        ? "Desafio não encontrado."
+        : "Não foi possível enviar a solicitação. Tente novamente.";
+      
+      Swal.fire({
+        title: "Erro!",
+        text: errorMessage,
+        icon: "error",
+        confirmButtonText: "OK",
+        customClass: {
+          container: "z-[9999]"
+        }
+      });
+    }
+  };
+
   if (!isOpen || !challenge) return null;
 
   return (
@@ -156,11 +272,11 @@ export default function DetalhesDesafio({
 
           {role === "STARTUP" && (
             <Button
-              onClick={() => console.log("Enviar convite")}
+              onClick={handleRequestConnection}
               size="sm"
               className="bg-blue-500 hover:bg-blue-600 text-white"
             >
-              ✉️ Convidar
+              ✉️ Solicitar Conexão
             </Button>
           )}
         </div>
@@ -314,7 +430,7 @@ export default function DetalhesDesafio({
             </div>
           </div>
 
-          {/* Visibilidade */}
+          {/* Visibilidade com botão para alterar (apenas no último estágio e para admin) */}
           <div className="flex items-center gap-3">
             <div
               className={`flex items-center gap-2 ${
@@ -353,6 +469,34 @@ export default function DetalhesDesafio({
                 <Lock className="w-4 h-4" />
                 Interno
               </span>
+            )}
+            
+            {/* Botão para alterar visibilidade (apenas no último estágio e para admin) */}
+            {isAdmin && isLastStage && (
+              <Button
+                onClick={handleToggleVisibility}
+                disabled={updatingVisibility}
+                size="sm"
+                className={`${
+                  challenge.visibility === "PUBLIC"
+                    ? "bg-slate-600 hover:bg-slate-700"
+                    : "bg-green-600 hover:bg-green-700"
+                } text-white`}
+              >
+                {updatingVisibility ? (
+                  "Alterando..."
+                ) : challenge.visibility === "PUBLIC" ? (
+                  <>
+                    <Lock size={16} />
+                    Tornar Privado
+                  </>
+                ) : (
+                  <>
+                    <Globe size={16} />
+                    Tornar Público
+                  </>
+                )}
+              </Button>
             )}
           </div>
         </div>
