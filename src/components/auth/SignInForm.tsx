@@ -49,13 +49,13 @@ export default function SignInForm() {
       email:data.email,
       password:data.password
     })
+    const {access_token, user } = response.data
+    localStorage.setItem("token", access_token);
 
     const role = getUserRole();
-    const {access_token, user } = response.data
 
 
     
-    localStorage.setItem("token", access_token);
     
     toast.success("Sucesso! Operação realizada.");
     router.push('/deshboard');
@@ -66,6 +66,8 @@ export default function SignInForm() {
       router.push("/dashboardGer");
     } else if (role === "EVALUATOR") {
       router.push("/deshboard");
+    } else if (role === "STARTUP") {
+      router.push("/page-desafios");
     } else {
       router.push("/deshboard");
     }

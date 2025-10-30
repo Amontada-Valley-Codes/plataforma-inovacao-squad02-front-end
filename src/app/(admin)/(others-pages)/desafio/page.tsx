@@ -23,8 +23,8 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import Swal from "sweetalert2";
 
+import Swal from "sweetalert2";
 
 const formSchema = z
   .object({
@@ -70,7 +70,6 @@ const statusList = [
   { label: "Pendente", value: "PENDING" },
 ];
 
-
 export default function Page() {
   const { isOpen, openModal, closeModal } = useModal();
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -88,22 +87,19 @@ export default function Page() {
   const [funnelStageFilter, setFunnelStageFilter] = useState("ALL");
   const [showFilters, setShowFilters] = useState(false);
 
-
   useEffect(() => {
     const userRole = getUserRole();
     setRoleState(userRole);
   }, []);
 
-useEffect(() => {
-  const handler = setTimeout(() => {
-    // Só busca se tiver 3+ caracteres OU se estiver vazio (para limpar)
-    if (searchTerm.length >= 3 || searchTerm.length === 0) {
-      setDebouncedSearch(searchTerm);
-    }
-  }, 1000); // Aumentei para 500ms
-  return () => clearTimeout(handler);
-}, [searchTerm]);
-
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      if (searchTerm.length >= 3 || searchTerm.length === 0) {
+        setDebouncedSearch(searchTerm);
+      }
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
 
   const {
     control,
@@ -122,7 +118,6 @@ useEffect(() => {
     },
   });
 
-  // Form específico para edição
   const {
     control: editControl,
     register: editRegister,
@@ -153,8 +148,8 @@ useEffect(() => {
         icon: "success",
         confirmButtonText: "OK",
         customClass: {
-          container: "z-[9999]"
-        }
+          container: "z-[9999]",
+        },
       });
       console.log("Desafio cadastrado:", response.data);
       setDesafios((prev) => [...prev, response.data]);
@@ -176,27 +171,29 @@ useEffect(() => {
     };
 
     try {
-      const response = await api.put(`/internal/challenges/${editingDesafio.id}`, payload);
+      const response = await api.put(
+        `/internal/challenges/${editingDesafio.id}`,
+        payload
+      );
       Swal.fire({
         title: "Sucesso!",
         text: "Desafio atualizado com sucesso.",
         icon: "success",
         confirmButtonText: "OK",
         customClass: {
-          container: "z-[9999]"
-        }
+          container: "z-[9999]",
+        },
       });
       console.log("Desafio atualizado:", response.data);
-      // Atualiza a lista localmente
-      setDesafios(prev =>
-        prev.map(desafio =>
+      setDesafios((prev) =>
+        prev.map((desafio) =>
           desafio.id === editingDesafio.id ? response.data : desafio
         )
       );
-      setEditModalOpen(false); // fecha o modal de edição
+      setEditModalOpen(false);
       setEditingDesafio(null);
-      editReset(); // reseta o formulário de edição
-      closeModal()
+      editReset();
+      closeModal();
     } catch (error) {
       console.error("Erro ao atualizar", error);
       setError("Erro ao atualizar desafio. Tente novamente.");
@@ -214,8 +211,8 @@ useEffect(() => {
       confirmButtonText: "Sim, excluir",
       cancelButtonText: "Cancelar",
       customClass: {
-        container: "z-[9999] "
-      }
+        container: "z-[9999] ",
+      },
     });
 
     if (!result.isConfirmed) {
@@ -224,8 +221,7 @@ useEffect(() => {
 
     try {
       await api.delete(`/internal/challenges/${id}`);
-      // Remove da lista localmente
-      setDesafios(prev => prev.filter(desafio => desafio.id !== id));
+      setDesafios((prev) => prev.filter((desafio) => desafio.id !== id));
     } catch (error) {
       console.error("Erro ao excluir", error);
       setError("Erro ao excluir desafio. Tente novamente.");
@@ -236,22 +232,22 @@ useEffect(() => {
         icon: "success",
         confirmButtonText: "OK",
         customClass: {
-          container: "z-[9999]"
-        }
+          container: "z-[9999]",
+        },
       });
       closeModal();
     }
   };
 
   const clearFilters = () => {
-  setSearchTerm("");
-  setVisibilityFilter("ALL");
-  setStatusFilter("ALL");
-  setFunnelStageFilter("ALL");
-  setCurrentPage(1);
-};
+    setSearchTerm("");
+    setVisibilityFilter("ALL");
+    setStatusFilter("ALL");
+    setFunnelStageFilter("ALL");
+    setCurrentPage(1);
+  };
 
-const hasActiveFilters = searchTerm || visibilityFilter !== "ALL" || statusFilter !== "ALL" || funnelStageFilter !== "ALL";
+  const hasActiveFilters = searchTerm || visibilityFilter !== "ALL" || statusFilter !== "ALL" || funnelStageFilter !== "ALL";
 
   const openEditModal = (desafio: Desafio) => {
     setEditingDesafio(desafio);
@@ -270,131 +266,127 @@ const hasActiveFilters = searchTerm || visibilityFilter !== "ALL" || statusFilte
     setEditingDesafio(null);
   };
 
-const fetchDesafios = async () => {
-  setLoading(true);
-  setError(null);
-  try {
-    let response;
-    let desafiosResult = [];
-
-    // 1) SE TEM BUSCA ATIVA
-    if (debouncedSearch && debouncedSearch.trim() !== "") {
-      console.log("🔍 Buscando por:", debouncedSearch);
-      
-      try {
-        // Tenta usar endpoint de busca
-        response = await api.get("/internal/challenges/search", {
-          params: { query: debouncedSearch, page: currentPage, limit: 15 },
-        });
-        console.log("📦 Resposta completa da API:", response.data);
-        desafiosResult = response.data.challenges;
-        console.log("✅ Busca API retornou:", desafiosResult.length, "resultados");
-      } catch (searchError) {
-        console.log("⚠️ Endpoint de busca falhou, fazendo busca local");
-        
-        // Fallback: busca TODOS os desafios e filtra localmente
-        response = await api.get("/internal/challenges", {
-          params: { 
-            page: 1, 
-            limit: 1000 // Busca todos para filtrar localmente
-          },
-        });
-        
-        const allDesafios = response?.data?.challenges ?? response?.data?.data ?? response?.data ?? [];
-        console.log("📦 Total de desafios para filtrar:", allDesafios.length);
-        
-        // Filtra localmente (case insensitive)
-        const searchLower = debouncedSearch.toLowerCase();
-        desafiosResult = Array.isArray(allDesafios) ? allDesafios.filter((d) => {
-          const matchName = d.name?.toLowerCase().includes(searchLower);
-          const matchTheme = d.theme?.toLowerCase().includes(searchLower);
-          const matchDesc = d.description?.toLowerCase().includes(searchLower);
-          return matchName || matchTheme || matchDesc;
-        }) : [];
-        
-        console.log("✅ Busca local retornou:", desafiosResult.length, "resultados");
-      }
-      
-      setDesafios(desafiosResult);
-      setTotalPages(1);
-      setLoading(false);
-      return;
-    }
-    
-    // 2) SE TEM FILTROS ATIVOS (status ou funnel)
-    if (statusFilter !== "ALL" || funnelStageFilter !== "ALL") {
-      console.log("🎯 Aplicando filtros:", { statusFilter, funnelStageFilter });
-      
-      const params: any = {};
-      if (statusFilter !== "ALL") params.status = statusFilter;
-      if (funnelStageFilter !== "ALL") params.funnelStage = funnelStageFilter;
-      if (visibilityFilter !== "ALL") params.visibility = visibilityFilter;
-      params.page = currentPage;
-      params.limit = 15;
-
-      try {
-        response = await api.get("/internal/challenges/filter", { params });
-        desafiosResult = response?.data?.challenges ?? response?.data?.data ?? response?.data ?? [];
-        console.log("✅ Filtro API retornou:", desafiosResult.length, "resultados");
-      } catch (filterError) {
-        console.log("⚠️ Endpoint de filtro falhou, fazendo filtro local");
-        
-        response = await api.get("/internal/challenges", {
-          params: { 
-            visibility: visibilityFilter !== "ALL" ? visibilityFilter : undefined,
-            page: 1, 
-            limit: 1000 
-          },
-        });
-        
-        const allDesafios = response?.data?.challenges ?? response?.data?.data ?? response?.data ?? [];
-        desafiosResult = Array.isArray(allDesafios) ? allDesafios.filter((d) => {
-          const matchStatus = statusFilter === "ALL" || d.status === statusFilter;
-          const matchFunnel = funnelStageFilter === "ALL" || d.funnelStage === funnelStageFilter;
-          return matchStatus && matchFunnel;
-        }) : [];
-        
-        console.log("✅ Filtro local retornou:", desafiosResult.length, "resultados");
-      }
-      
-      setDesafios(desafiosResult);
-      setTotalPages(1);
-      setLoading(false);
-      return;
-    }
-    
-    // 3) BUSCA PADRÃO (sem filtros nem busca)
-    console.log("📋 Buscando todos os desafios");
-    response = await api.get("/internal/challenges", {
-      params: {
-        visibility: visibilityFilter !== "ALL" ? visibilityFilter : undefined,
-        page: currentPage,
-        limit: 15,
-      },
-    });
-
-    desafiosResult = response?.data?.challenges ?? response?.data?.data ?? response?.data ?? [];
-    console.log("✅ Listagem retornou:", desafiosResult.length, "resultados");
-    
-    setDesafios(desafiosResult);
-
-    // Paginação
-    if (response?.data?.pagination) {
-      setTotalPages(Math.max(1, Math.ceil(response.data.pagination.total / response.data.pagination.limit)));
-    } else {
-      setTotalPages(1);
-    }
-    
-  } catch (err) {
-    console.error("❌ Erro ao buscar desafios:", err);
-    setError("Erro ao carregar desafios.");
-    setDesafios([]);
-  } finally {
-    setLoading(false);
-  }
-};
-
   useEffect(() => {
+    const fetchDesafios = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        let response;
+        let desafiosResult = [];
+
+        // 1) SE TEM BUSCA ATIVA
+        if (debouncedSearch && debouncedSearch.trim() !== "") {
+          console.log("🔍 Buscando por:", debouncedSearch);
+          
+          try {
+            response = await api.get("/internal/challenges/search", {
+              params: { query: debouncedSearch, page: currentPage, limit: 15 },
+            });
+            console.log("📦 Resposta completa da API:", response.data);
+            desafiosResult = response.data.challenges;
+            console.log("✅ Busca API retornou:", desafiosResult.length, "resultados");
+          } catch (searchError) {
+            console.log("⚠️ Endpoint de busca falhou, fazendo busca local");
+            
+            response = await api.get("/internal/challenges", {
+              params: { 
+                page: 1, 
+                limit: 1000
+              },
+            });
+            
+            const allDesafios = response?.data?.challenges ?? response?.data?.data ?? response?.data ?? [];
+            console.log("📦 Total de desafios para filtrar:", allDesafios.length);
+            
+            const searchLower = debouncedSearch.toLowerCase();
+            desafiosResult = Array.isArray(allDesafios) ? allDesafios.filter((d) => {
+              const matchName = d.name?.toLowerCase().includes(searchLower);
+              const matchTheme = d.theme?.toLowerCase().includes(searchLower);
+              const matchDesc = d.description?.toLowerCase().includes(searchLower);
+              return matchName || matchTheme || matchDesc;
+            }) : [];
+            
+            console.log("✅ Busca local retornou:", desafiosResult.length, "resultados");
+          }
+          
+          setDesafios(desafiosResult);
+          setTotalPages(1);
+          setLoading(false);
+          return;
+        }
+        
+        // 2) SE TEM FILTROS ATIVOS (status ou funnel)
+        if (statusFilter !== "ALL" || funnelStageFilter !== "ALL") {
+          console.log("🎯 Aplicando filtros:", { statusFilter, funnelStageFilter });
+          
+          const params: any = {};
+          if (statusFilter !== "ALL") params.status = statusFilter;
+          if (funnelStageFilter !== "ALL") params.funnelStage = funnelStageFilter;
+          if (visibilityFilter !== "ALL") params.visibility = visibilityFilter;
+          params.page = currentPage;
+          params.limit = 15;
+
+          try {
+            response = await api.get("/internal/challenges/filter", { params });
+            desafiosResult = response?.data?.challenges ?? response?.data?.data ?? response?.data ?? [];
+            console.log("✅ Filtro API retornou:", desafiosResult.length, "resultados");
+          } catch (filterError) {
+            console.log("⚠️ Endpoint de filtro falhou, fazendo filtro local");
+            
+            response = await api.get("/internal/challenges", {
+              params: { 
+                visibility: visibilityFilter !== "ALL" ? visibilityFilter : undefined,
+                page: 1, 
+                limit: 1000 
+              },
+            });
+            
+            const allDesafios = response?.data?.challenges ?? response?.data?.data ?? response?.data ?? [];
+            desafiosResult = Array.isArray(allDesafios) ? allDesafios.filter((d) => {
+              const matchStatus = statusFilter === "ALL" || d.status === statusFilter;
+              const matchFunnel = funnelStageFilter === "ALL" || d.funnelStage === funnelStageFilter;
+              return matchStatus && matchFunnel;
+            }) : [];
+            
+            console.log("✅ Filtro local retornou:", desafiosResult.length, "resultados");
+          }
+          
+          setDesafios(desafiosResult);
+          setTotalPages(1);
+          setLoading(false);
+          return;
+        }
+        
+        // 3) BUSCA PADRÃO (sem filtros nem busca)
+        console.log("📋 Buscando todos os desafios");
+        response = await api.get("/internal/challenges", {
+          params: {
+            visibility: visibilityFilter !== "ALL" ? visibilityFilter : undefined,
+            page: currentPage,
+            limit: 15,
+          },
+        });
+
+        desafiosResult = response?.data?.challenges ?? response?.data?.data ?? response?.data ?? [];
+        console.log("✅ Listagem retornou:", desafiosResult.length, "resultados");
+        
+        setDesafios(desafiosResult);
+
+        if (response?.data?.pagination) {
+          setTotalPages(Math.max(1, Math.ceil(response.data.pagination.total / response.data.pagination.limit)));
+        } else {
+          setTotalPages(1);
+        }
+        
+      } catch (err) {
+        console.error("❌ Erro ao buscar desafios:", err);
+        setError("Erro ao carregar desafios.");
+        setDesafios([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchDesafios();
   }, [currentPage, visibilityFilter, statusFilter, funnelStageFilter, debouncedSearch]);  
 
@@ -411,15 +403,15 @@ const fetchDesafios = async () => {
       <div className="px-3 py-5 rounded-2xl">
         <div className="flex justify-between items-center">
           <p className="text-2xl">Desafios</p>
-            <Button onClick={openModal} size="sm" variant="primary">
-              <Lightbulb size={20} />
-              Criar Desafio
-            </Button>
+          <Button onClick={openModal} size="sm" variant="primary">
+            <Lightbulb size={20} />
+            Criar Desafio
+          </Button>
         </div>
       </div>
 
       <div className="px-6 pb-8">
-        {error? (
+        {error ? (
           <div className="mx-6 mt-6 bg-red-100 border border-red-400 text-red-500 px-4 py-3 rounded">
             {error}
           </div>
@@ -429,11 +421,13 @@ const fetchDesafios = async () => {
             <h3 className="text-xl font-semibold text-gray-600 dark:text-gray-300 mb-2">
               Nenhum desafio criado ainda
             </h3>
-            <p className="text-gray-500 dark:text-gray-300">Comece criando seu primeiro desafio!</p>
+            <p className="text-gray-500 dark:text-gray-300">
+              Comece criando seu primeiro desafio!
+            </p>
           </div>
         ) : (
           <>
-          {/* 🔍 Barra de busca e filtros - MELHORADA */}
+          {/* 🔍 Barra de busca e filtros */}
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 mb-6">
             {/* Busca + Botão Filtros */}
             <div className="flex flex-col sm:flex-row gap-3 mb-3">
@@ -517,84 +511,100 @@ const fetchDesafios = async () => {
                     </Button>
                   </div>
                 )}
-
-                {!loading && desafios.length === 0 && hasActiveFilters && (
-                  <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700">
-                    <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
-                      <Search className="w-8 h-8 text-gray-400" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-gray-600 dark:text-gray-300 mb-2">
-                      Nenhum desafio encontrado
-                    </h3>
-                    <p className="text-gray-500 dark:text-gray-400 mb-4">
-                      Não encontramos desafios com os filtros aplicados
-                    </p>
-                    <Button size="sm" variant="outline" onClick={clearFilters} className="flex items-center gap-2 mx-auto">
-                      <X size={16} />
-                      Limpar todos os filtros
-                    </Button>
-                  </div>
-                )}
-
-            </div>
+              </div>
             )}
           </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Array.isArray(desafios) && desafios.map((desafio) => (
-                <Card
-                  key={desafio.id}
-                  id={desafio.id}
-                  title={desafio.name}
-                  description={desafio.description}
-                  status={desafio.status}
-                  startDate={new Date(desafio.startDate).toLocaleDateString()}
-                  endDate={
-                    desafio.endDate
-                      ? new Date(desafio.endDate).toLocaleDateString()
-                      : ""
-                  }
-                  theme={desafio.theme}
-                  visibility={desafio.visibility}
-                  funnelStage={desafio.funnelStage}
-                  isAdmin={roleState === 'MANAGER'}
-                  onEdit={() => openEditModal(desafio)}
-                  onDelete={() => onDelete(desafio.id)}
-                />
-              ))}
+          {!loading && desafios.length === 0 && hasActiveFilters && (
+            <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700">
+              <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
+                <Search className="w-8 h-8 text-gray-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-600 dark:text-gray-300 mb-2">
+                Nenhum desafio encontrado
+              </h3>
+              <p className="text-gray-500 dark:text-gray-400 mb-4">
+                Não encontramos desafios com os filtros aplicados
+              </p>
+              <Button size="sm" variant="outline" onClick={clearFilters} className="flex items-center gap-2 mx-auto">
+                <X size={16} />
+                Limpar todos os filtros
+              </Button>
             </div>
+          )}
 
-            <div className="mt-6 flex justify-center">
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious
-                      href="#"
-                      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                      aria-disabled={currentPage === 1}
-                    />
-                  </PaginationItem>
-                  {[...Array(totalPages)].map((_, idx) => (
-                    <PaginationItem key={idx}>
-                      <PaginationLink
+          {desafios.length > 0 && (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {Array.isArray(desafios) && desafios.map((desafio) => (
+                  <Card
+                    key={desafio.id}
+                    id={desafio.id}
+                    title={desafio.name}
+                    description={desafio.description}
+                    status={desafio.status}
+                    startDate={new Date(desafio.startDate).toLocaleDateString()}
+                    endDate={
+                      desafio.endDate
+                        ? new Date(desafio.endDate).toLocaleDateString()
+                        : ""
+                    }
+                    theme={desafio.theme}
+                    visibility={desafio.visibility}
+                    funnelStage={desafio.funnelStage}
+                    isAdmin={roleState === "MANAGER"}
+                    onEdit={() => openEditModal(desafio)}
+                    onDelete={() => onDelete(desafio.id)}
+                    onVisibilityChange={(newVisibility) => {
+                      setDesafios((prev) =>
+                        prev.map((d) =>
+                          d.id === desafio.id
+                            ? { ...d, visibility: newVisibility }
+                            : d
+                        )
+                      );
+                    }}
+                  />
+                ))}
+              </div>
+
+              <div className="mt-6 flex justify-center">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious
                         href="#"
-                        isActive={currentPage === idx + 1}
-                        onClick={() => setCurrentPage(idx + 1)}
-                      >
-                        {idx + 1}
-                      </PaginationLink>
+                        onClick={() =>
+                          setCurrentPage((prev) => Math.max(prev - 1, 1))
+                        }
+                        aria-disabled={currentPage === 1}
+                      />
                     </PaginationItem>
-                  ))}
-                  <PaginationItem>
-                    <PaginationNext
-                      href="#"
-                      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                      aria-disabled={currentPage === totalPages}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </div>
+                    {[...Array(totalPages)].map((_, idx) => (
+                      <PaginationItem key={idx}>
+                        <PaginationLink
+                          href="#"
+                          isActive={currentPage === idx + 1}
+                          onClick={() => setCurrentPage(idx + 1)}
+                        >
+                          {idx + 1}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    <PaginationItem>
+                      <PaginationNext
+                        href="#"
+                        onClick={() =>
+                          setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                        }
+                        aria-disabled={currentPage === totalPages}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            </>
+          )}
           </>
         )}
       </div>
@@ -633,7 +643,9 @@ const fetchDesafios = async () => {
                     )}
                   />
                   {errors.startDate && (
-                    <span className="text-red-600">{errors.startDate.message}</span>
+                    <span className="text-red-600">
+                      {errors.startDate.message}
+                    </span>
                   )}
                 </div>
 
@@ -652,7 +664,9 @@ const fetchDesafios = async () => {
                     )}
                   />
                   {errors.endDate && (
-                    <span className="text-red-600">{errors.endDate.message}</span>
+                    <span className="text-red-600">
+                      {errors.endDate.message}
+                    </span>
                   )}
                 </div>
 
@@ -690,7 +704,6 @@ const fetchDesafios = async () => {
                   )}
                 </div>
 
-
                 <Button className="w-full mt-2" size="sm">
                   Criar Desafio
                 </Button>
@@ -715,7 +728,9 @@ const fetchDesafios = async () => {
                     {...editRegister("name")}
                   />
                   {editErrors.name && (
-                    <span className="text-red-600">{editErrors.name.message}</span>
+                    <span className="text-red-600">
+                      {editErrors.name.message}
+                    </span>
                   )}
                 </div>
 
@@ -734,7 +749,9 @@ const fetchDesafios = async () => {
                     )}
                   />
                   {editErrors.startDate && (
-                    <span className="text-red-600">{editErrors.startDate.message}</span>
+                    <span className="text-red-600">
+                      {editErrors.startDate.message}
+                    </span>
                   )}
                 </div>
 
@@ -753,7 +770,9 @@ const fetchDesafios = async () => {
                     )}
                   />
                   {editErrors.endDate && (
-                    <span className="text-red-600">{editErrors.endDate.message}</span>
+                    <span className="text-red-600">
+                      {editErrors.endDate.message}
+                    </span>
                   )}
                 </div>
 
@@ -765,7 +784,9 @@ const fetchDesafios = async () => {
                     {...editRegister("theme")}
                   />
                   {editErrors.theme && (
-                    <span className="text-red-600">{editErrors.theme.message}</span>
+                    <span className="text-red-600">
+                      {editErrors.theme.message}
+                    </span>
                   )}
                 </div>
 

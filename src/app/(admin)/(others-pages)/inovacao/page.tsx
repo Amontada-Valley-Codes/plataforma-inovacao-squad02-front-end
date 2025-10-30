@@ -9,6 +9,7 @@ import Button from "@/components/ui/button/Button";
 import { useKanbanChallenges } from "@/hooks/useKanbanChallenges";
 import { ChallengeType } from "@/types/challenge";
 import DetalhesDesafio from "@/components/desafio/detailsDesafio";
+import { getUserRole } from "@/utils/getUserRole";
 
 const COLUMN_TITLES: Record<string, string> = {
   idea_generation: "Geração de Ideias",        
@@ -57,6 +58,12 @@ export default function ChallengesKanbanPage() {
   const [selectedChallenge, setSelectedChallenge] =
     React.useState<ChallengeType | null>(null);
   const [isDetailOpen, setIsDetailOpen] = React.useState(false);
+  const [userRole, setUserRole] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const role = getUserRole();
+    setUserRole(role);
+  }, []);
 
   const openDetails = (challenge: ChallengeType) => {
     if (!challenge?.id) return;
@@ -96,6 +103,33 @@ export default function ChallengesKanbanPage() {
     setSelectedChallenge(null);
   };
 
+  const handleVisibilityChange = React.useCallback((
+    challengeId: string,
+    newVisibility: "PUBLIC" | "INTERNAL"
+  ) => {
+    setColumns((prevColumns) => {
+      const newColumns = { ...prevColumns };
+      
+      // Atualiza a visibilidade do desafio em todas as colunas
+      Object.keys(newColumns).forEach((columnKey) => {
+        newColumns[columnKey] = newColumns[columnKey].map((challenge) =>
+          challenge.id === challengeId
+            ? { ...challenge, visibility: newVisibility }
+            : challenge
+        );
+      });
+      
+      return newColumns;
+    });
+
+    // Atualiza o desafio selecionado se for o mesmo
+    if (selectedChallenge?.id === challengeId) {
+      setSelectedChallenge((prev) => 
+        prev ? { ...prev, visibility: newVisibility } : null
+      );
+    }
+  }, [selectedChallenge, setColumns]);
+
   const handleColumnsChange = React.useCallback(
     async (newColumns: Record<string, any[]>) => {
       for (const [newColumnId, newColumnChallenges] of Object.entries(
@@ -128,7 +162,7 @@ export default function ChallengesKanbanPage() {
   );
 
   const handleMove = React.useCallback(async (event: any) => {
-    console.log(" onMove chamado:", event);
+    console.log("🔄 onMove chamado:", event);
   }, []);
 
   if (isLoading) {
@@ -152,19 +186,20 @@ export default function ChallengesKanbanPage() {
     );
   }
 
+  const isAdmin = userRole === "MANAGER";
+
   return (
     <div className="h-full flex flex-col">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold">Funil de Inovação  </h1>
+          <h1 className="text-2xl font-bold">Funil de Inovação</h1>
           <p className="text-muted-foreground">
             Gerencie os desafios da sua empresa
           </p>
         </div>
-        
       </div>
 
-      <div className="flex-1 ">
+      <div className="flex-1">
         <Kanban.Root
           value={columns}
           onValueChange={handleColumnsChange}
@@ -216,7 +251,10 @@ export default function ChallengesKanbanPage() {
           challenge={selectedChallenge as any}
           isOpen={isDetailOpen}
           onClose={closeDetails}
-          isAdmin={false}
+          isAdmin={isAdmin}
+          onVisibilityChange={(newVisibility) => 
+            handleVisibilityChange(selectedChallenge.id, newVisibility)
+          }
         />
       )}
     </div>
@@ -336,11 +374,6 @@ function ChallengeColumn({
           <span className="font-semibold text-sm">{COLUMN_TITLES[value]}</span>
           <Badge>{challenges.length}</Badge>  
         </div>
-        {/* <Kanban.ColumnHandle asChild> */}
-          {/* <Button variant="outline" size="sm" className="cursor-grab"> */}
-            {/* <GripVertical className="h-4 w-4" /> */}
-          {/* </Button> */}
-        {/* </Kanban.ColumnHandle> */}
       </div>
 
       <div className="flex flex-col gap-2 p-2">
