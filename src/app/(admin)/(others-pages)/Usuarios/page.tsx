@@ -141,9 +141,8 @@ export default function Page() {
                   {...register("role")}
                 >
                   <option value="">selecione um</option>
-                  <option value="COMMON">COMMON</option>
-                  <option value="EVALUATOR">EVALUATOR</option>
-                  <option value="MANAGER">MANAGER</option>
+                  <option value="COMMON">Comum</option>
+                  <option value="EVALUATOR">Avaliador</option>
                 </select>
                 {errors.role && (
                   <span className="text-red-600">{errors.role.message}</span>

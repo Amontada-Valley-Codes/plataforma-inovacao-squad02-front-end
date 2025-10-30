@@ -11,7 +11,7 @@ import {
   UserCircleIcon,
 } from "../icons/index";
 import SidebarWidget from "./SidebarWidget";
-import { Brain, Building, Building2, Lightbulb, Rocket, User } from "lucide-react";
+import { Brain, Building, Building2, Rocket, User } from "lucide-react";
 import { getUserRole } from "@/utils/getUserRole";
 
 type NavItem = {
@@ -22,9 +22,9 @@ type NavItem = {
 };
 
 const allNavItems: NavItem[] = [
-  { icon: <GridIcon />, name: "DashboardAdm", path: "/dashboardAdm" },
-  { icon: <GridIcon />, name: "DashboardGer", path: "/dashboardGer" },
-  { icon: <GridIcon />, name: "Dashboard", path: "/deshboard" },
+  { icon: <GridIcon />, name: "Dashboard", path: "/dashboardAdm" },
+  { icon: <GridIcon />, name: "Dashboard", path: "/dashboardGer" },
+  { icon: <GridIcon />, name: "Dashboard", path: "/dashboardUser" },
   { icon: <Brain />, name: "Desafio", path: "/desafio" },
   { icon: <Building2 />, name: "Startups", path: "/startups" },
   { icon: <Rocket />, name: "Funil de inovações", path: "/inovacao" },
@@ -50,13 +50,13 @@ const AppSidebar: React.FC = () => {
   
   const filteredNavItems = allNavItems.filter((item) => {
     if (userRole === "ADMIN") 
-      return [ "Perfil","DashboardAdm","Startups","Empresa"].includes(item.name);
+      return [ "/profile","/dashboardAdm","/startups","/empresa"].includes(item.path);
     if (userRole === "MANAGER")
-      return ["Usuários","Desafio","Perfil","DashboardGer","Funil de inovações"].includes(item.name);
+      return ["/Usuarios","/desafio","/profile","/dashboardGer","/inovacao"].includes(item.path);
     if (userRole === "EVALUATOR")
-      return ["Dashboard", "Desafio", "Startups", "Perfil","Funil de inovações"].includes(item.name);
+      return ["/dashboardGer", "/desafio", "/profile","/inovacao"].includes(item.path);
     if (userRole === "COMMON")
-      return ["Dashboard", "Desafio", "Perfil"].includes(item.name);
+      return ["/dashboardUser", "/desafio", "/profile"].includes(item.path);
     return false;
   });
 
@@ -273,29 +273,13 @@ const AppSidebar: React.FC = () => {
               {renderMenuItems(filteredNavItems, "main")}
             </div>
 
-            <div>
-              <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
-                  !isExpanded && !isHovered
-                    ? "lg:justify-center"
-                    : "justify-start"
-                }`}
-              >
-                {isExpanded || isHovered || isMobileOpen ? "Others" : <HorizontaLDots />}
-              </h2>
-              {renderMenuItems(othersItems, "others")}
-            </div>
+            
           </div>
         </nav>
 
         {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null}
 
-        {userRole && (
-          <div className="text-xs text-gray-400 mt-4 text-center">
-            Logado como:{" "}
-            <span className="font-semibold text-gray-600">{userRole}</span>
-          </div>
-        )}
+        
       </div>
     </aside>
   );
