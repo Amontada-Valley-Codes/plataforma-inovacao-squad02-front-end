@@ -13,19 +13,36 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
-type Desafio = {
+type DesafioAPI = {
   id: string;
-  nome: string;
-  tema: string;
-  descricao: string;
-  privacidade: "PUBLICO" | "INTERNO";
-  dataInicio: string;
-  dataFim: string;
+  name: string;
+  theme: string;
+  description: string;
+  visibility: "PUBLIC" | "INTERNAL";
+  startDate: string;
+  endDate: string;
   status: string;
+  funnelStage?: string;
+  companyId: string;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type DesafioFormatado = {
+  id: string;
+  title: string;
+  theme: string;
+  description: string;
+  visibility: "PUBLIC" | "INTERNAL";
+  startDate: string;
+  endDate: string;
+  status: string;
+  funnelStage: string;
 };
 
 export default function Page() {
-  const [desafios, setDesafios] = useState<Desafio[]>([]);
+  const [desafios, setDesafios] = useState<DesafioFormatado[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalPages, setTotalPages] = useState(1);
@@ -43,7 +60,22 @@ export default function Page() {
         });
 
         const { data, total, limit } = response.data;
-        setDesafios(data);
+        
+        const desafiosFormatados: DesafioFormatado[] = data.map((desafio: DesafioAPI) => ({
+          id: desafio.id,
+          title: desafio.name,
+          theme: desafio.theme,
+          description: desafio.description,
+          visibility: desafio.visibility,
+          startDate: new Date(desafio.startDate).toLocaleDateString("pt-BR"),
+          endDate: desafio.endDate 
+            ? new Date(desafio.endDate).toLocaleDateString("pt-BR") 
+            : "",
+          status: desafio.status,
+          funnelStage: desafio.funnelStage || "",
+        }));
+
+        setDesafios(desafiosFormatados);
         setTotalPages(Math.ceil(total / limit));
       } catch (error) {
         console.error("Erro ao buscar desafios públicos:", error);
@@ -89,32 +121,24 @@ export default function Page() {
           </div>
         ) : (
           <>
-            {/* Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {desafios.map((desafio) => (
                 <Card
                   key={desafio.id}
                   id={desafio.id}
-                  title={desafio.nome}
-                  description={desafio.descricao}
+                  title={desafio.title}
+                  description={desafio.description}
                   status={desafio.status}
-                  startDate={new Date(desafio.dataInicio).toLocaleDateString()}
-                  endDate={
-                    desafio.dataFim
-                      ? new Date(desafio.dataFim).toLocaleDateString()
-                      : ""
-                  }
-                  theme={desafio.tema}
-                  visibility={
-  desafio.privacidade === "PUBLICO" ? "PUBLIC" : "INTERNAL"
-}
-                  funnelStage=""
-                  isAdmin={false} 
+                  startDate={desafio.startDate}
+                  endDate={desafio.endDate}
+                  theme={desafio.theme}
+                  visibility={desafio.visibility}
+                  funnelStage={desafio.funnelStage}
+                  isAdmin={false}
                 />
               ))}
             </div>
 
-            {/* Paginação */}
             <div className="mt-6 flex justify-center">
               <Pagination>
                 <PaginationContent>
