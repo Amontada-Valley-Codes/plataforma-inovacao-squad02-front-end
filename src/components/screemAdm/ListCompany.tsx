@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import axios from "axios";
 import {
   Table,
   TableBody,
@@ -9,7 +8,6 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-
 import {
   Pagination,
   PaginationContent,
@@ -47,16 +45,12 @@ export default function ListCompany() {
     setLoading(true);
     setError(null);
     try {
-      const { data } = await api.get<CompanyResponse>(
-        "/dashboard/companies",
-        {
-          params: { page: currentPage, limit },
-          headers: { accept: "application/json" },
-        }
-      );
+      const { data } = await api.get<CompanyResponse>("/dashboard/companies", {
+        params: { page: currentPage, limit },
+        headers: { accept: "application/json" },
+      });
 
       setCompanies(data.data);
-      // Se a API não retornar total/limit, substitua essa linha por um valor fixo de páginas
       setTotalPages(Math.ceil(data.total / data.limit || 1));
     } catch (err: any) {
       setError(err.response?.data?.message || "Erro ao buscar empresas");
@@ -72,12 +66,12 @@ export default function ListCompany() {
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
-      window.scrollTo({ top: 0, behavior: "smooth" }); // rola pra cima ao trocar de página
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   return (
-    <div className="overflow-hidden rounded-2xl border-1 border-l-4 border-[#fb6514] bg-white px-4 pb-3 pt-4 shadow-lg dark:border-gray-800 dark:bg-gray-900 sm:px-6">
+    <div className="overflow-hidden rounded-2xl border-1 border-l-4 border-[#fb6514] bg-white px-4 pb-3 pt-4 shadow-lg dark:border-[#fb6514] dark:bg-gray-900 sm:px-6">
       <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h3 className="text-xl font-bold text-[#fb6514]">Lista de Empresas</h3>
@@ -134,15 +128,12 @@ export default function ListCompany() {
                         {company.name}
                       </p>
                     </TableCell>
-
                     <TableCell className="py-3 text-center text-sm text-gray-700 dark:text-gray-300">
                       {company.totalUsers}
                     </TableCell>
-
                     <TableCell className="py-3 text-center text-sm text-gray-700 dark:text-gray-300">
                       {company.activeChallenges}
                     </TableCell>
-
                     <TableCell className="py-3 text-center text-sm text-gray-700 dark:text-gray-300">
                       <div
                         className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
@@ -160,7 +151,6 @@ export default function ListCompany() {
             </Table>
           </div>
 
-          {/* PAGINAÇÃO */}
           {totalPages > 1 && (
             <div className="mt-6 flex flex-col items-center gap-2">
               <Pagination>
@@ -204,7 +194,6 @@ export default function ListCompany() {
                 </PaginationContent>
               </Pagination>
 
-              {/* Indicador de página atual */}
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Página {currentPage} de {totalPages}
               </p>
