@@ -10,20 +10,12 @@ export default function NavbarComponent() {
     <div className="w-full fixed top-0 z-50 border-b-1 border-warning-400 bg-white/90 backdrop-blur-sm dark:bg-gray-900/90">
       <Navbar fluid={true} rounded>
         <NavbarBrand href="/">
-          {/* <Image
-            src="/hivehub-icon.png"
-            width={37}
-          height={37}
-          className="mr-3 md:ml-15 h-6 sm:h-9" 
-          alt="HiveHub Logo" 
-        /> */}
-        {/* <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">HiveHub</span> */}
 
         <Image src={"/HiveHub-logopreto.png"}
         alt="logo Hive Hub"
         width={200}
         height={200}
-        className="block dark:hidden h-12 w-28 mr-3"  
+        className="block dark:hidden h-12 w-28 ml-14"  
       />
       
       <Image src={"/HiveHub-logobranca.png"}
