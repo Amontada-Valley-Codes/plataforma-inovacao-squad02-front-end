@@ -191,7 +191,7 @@ export default function DetalhesDesafio({
     }
 
     try {
-     await api.post(`/connections/request/${challenge.id}`);
+      await api.post(`/connections/request/${challenge.id}`);
       
       Swal.fire({
         title: "Solicitação Enviada!",
