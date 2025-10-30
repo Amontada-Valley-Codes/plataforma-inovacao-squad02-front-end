@@ -65,11 +65,11 @@ export default function SignInForm() {
     } else if (role === "MANAGER") {
       router.push("/dashboardGer");
     } else if (role === "EVALUATOR") {
-      router.push("/deshboard");
+      router.push("/dashboardGer");
     } else if (role === "STARTUP") {
       router.push("/page-desafios");
     } else {
-      router.push("/deshboard");
+      router.push("/dashboardUser");
     }
     reset()
     }catch(error){
